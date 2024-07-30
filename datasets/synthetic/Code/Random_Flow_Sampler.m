@@ -448,7 +448,15 @@ for i = 1:n_graph_params
                         R = R';
 
                         %% sample
-                        Flows{i,k,j,l} = R'*randn(E,parameters.n_real.flow);
+                        if strcmp(parameters.distribution,'Gaussian')
+                            Flows{i,k,j,l} = R'*randn(E,parameters.n_real.flow);
+                        elseif strcmp(parameters.distribution,'Laplace')
+                            Flows{i,k,j,l} = R'*randl(E,parameters.n_real.flow);
+                        elseif strcmp(parameters.distribution,'Student T')
+                            Flows{i,k,j,l} = R'*trnd(3,E,parameters.n_real.flow)/sqrt(3);
+                        elseif strcmp(parameters.distribution,'Uniform')
+                            Flows{i,k,j,l} = sqrt(3)*R'*(2*rand(E,parameters.n_real.flow) - 1);
+                        end
                     else
                         %% Compute covariance on subset of 1000 edges
                         Averaging_M_subset = ((1 - cov_averaging_weight)*speye(edge_max,edge_max) + cov_averaging_weight*diag(1./edge_degrees(1:edge_max))*av_sign*A_edge(1:edge_max,1:edge_max))^(cov_dist - 1);
@@ -466,7 +474,15 @@ for i = 1:n_graph_params
                         % Flows{i,k,j,l} = R*randn(rank,parameters.n_real.flow);
 
                         %% sample potentials
-                        U = randn(V,parameters.n_real.flow);
+                        if strcmp(parameters.distribution,'Gaussian')
+                            U = randn(V,parameters.n_real.flow);
+                        elseif strcmp(parameters.distribution,'Laplace')
+                            U = randl(V,parameters.n_real.flow);
+                        elseif strcmp(parameters.distribution,'Student T')
+                            U = trnd(3,V,parameters.n_real.flow)/sqrt(3);
+                        elseif strcmp(parameters.distribution,'Uniform')
+                            U = sqrt(3)*(2*rand(V,parameters.n_real.flow) - 1);
+                        end
 
                         %% convert to flow
                         flow = G*U; % has covariance G*G' = A_edge + 2 I
