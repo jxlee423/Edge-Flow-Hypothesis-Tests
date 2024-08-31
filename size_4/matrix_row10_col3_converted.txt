@@ -1,0 +1,58 @@
+gtrieScanner Results
+------------------------------------------
+General Information
+
+Start of Computation: 23h19m12s 28/08/2024
+End of Computation: 23h19m15s 28/08/2024
+
+Subgraph Size: 4
+Graph File: "/content/drive/MyDrive/Colab_Notebooks/gtrieScanner_src_01/test_output/Erdos/converted_files/matrix_row10_col3_converted.txt"
+Directed: NO
+Nr Nodes: 215
+Nr Edges: 2129
+
+Method: ESU on original network
+Different Types of Subgraphs Found [Original Network]: 6
+Subgraph Occurrences Found [Original Network]: 910108
+Time for computing census on original network: 2.679614s
+Average time for census on random network: 0.000000s
+
+Number of random networks: 0
+Random seed: 1724887152
+Exchanges per edge: 3
+Number of tries per exchange: 10
+------------------------------------------
+Motif Analysis Results
+
+Graph   Org_Freq |  Z-score |    Rnd_Avg +/-    Rnd_Dev
+
+0110
+1001
+1000
+0100      620692 |     0.00 |       0.00 +/-       0.00
+
+0111
+1000
+1000
+1000      207762 |     0.00 |       0.00 +/-       0.00
+
+0111
+1010
+1100
+1000       62284 |     0.00 |       0.00 +/-       0.00
+
+0110
+1001
+1001
+0110       16246 |     0.00 |       0.00 +/-       0.00
+
+0111
+1011
+1100
+1100        3083 |     0.00 |       0.00 +/-       0.00
+
+0111
+1011
+1101
+1110          41 |     0.00 |       0.00 +/-       0.00
+

@@ -1,0 +1,20 @@
+REJECT for matrix 1 (diagonal case rejected, rho*sigma^2 case rejected) in file matrix_10_3_processed_flows_covariance_matrices_with_intervals.txt
+REJECT for matrix 2 (diagonal case rejected, zero case for (0,1) rejected) in file matrix_10_3_processed_flows_covariance_matrices_with_intervals.txt
+REJECT for matrix 3 (diagonal case rejected, zero case for (0,1) rejected, rho*sigma^2 case rejected) in file matrix_10_3_processed_flows_covariance_matrices_with_intervals.txt
+REJECT for matrix 4 (rho*sigma^2 case rejected) in file matrix_10_3_processed_flows_covariance_matrices_with_intervals.txt
+REJECT for matrix 5 (diagonal case rejected, rho*sigma^2 case rejected) in file matrix_10_3_processed_flows_covariance_matrices_with_intervals.txt
+REJECT for matrix 6 (diagonal case rejected, rho*sigma^2 case rejected) in file matrix_10_3_processed_flows_covariance_matrices_with_intervals.txt
+REJECT for matrix 7 (diagonal case rejected, rho*sigma^2 case rejected) in file matrix_10_3_processed_flows_covariance_matrices_with_intervals.txt
+REJECT for matrix 8 (diagonal case rejected, zero case for (0,1) rejected, rho*sigma^2 case rejected) in file matrix_10_3_processed_flows_covariance_matrices_with_intervals.txt
+REJECT for matrix 9 (diagonal case rejected) in file matrix_10_3_processed_flows_covariance_matrices_with_intervals.txt
+REJECT for matrix 10 (diagonal case rejected, zero case for (0,1) rejected, rho*sigma^2 case rejected) in file matrix_10_3_processed_flows_covariance_matrices_with_intervals.txt
+REJECT for matrix 11 (zero case for (0,1) rejected, rho*sigma^2 case rejected) in file matrix_10_3_processed_flows_covariance_matrices_with_intervals.txt
+REJECT for matrix 12 (diagonal case rejected, rho*sigma^2 case rejected) in file matrix_10_3_processed_flows_covariance_matrices_with_intervals.txt
+REJECT for matrix 13 (diagonal case rejected, zero case for (0,1) rejected, rho*sigma^2 case rejected) in file matrix_10_3_processed_flows_covariance_matrices_with_intervals.txt
+REJECT for matrix 14 (rho*sigma^2 case rejected) in file matrix_10_3_processed_flows_covariance_matrices_with_intervals.txt
+REJECT for matrix 15 (diagonal case rejected, rho*sigma^2 case rejected) in file matrix_10_3_processed_flows_covariance_matrices_with_intervals.txt
+REJECT for matrix 16 (diagonal case rejected, zero case for (0,1) rejected) in file matrix_10_3_processed_flows_covariance_matrices_with_intervals.txt
+REJECT for matrix 17 (diagonal case rejected, rho*sigma^2 case rejected) in file matrix_10_3_processed_flows_covariance_matrices_with_intervals.txt
+REJECT for matrix 18 (rho*sigma^2 case rejected) in file matrix_10_3_processed_flows_covariance_matrices_with_intervals.txt
+REJECT for matrix 19 (diagonal case rejected, rho*sigma^2 case rejected) in file matrix_10_3_processed_flows_covariance_matrices_with_intervals.txt
+REJECT for matrix 20 (diagonal case rejected, rho*sigma^2 case rejected) in file matrix_10_3_processed_flows_covariance_matrices_with_intervals.txt
