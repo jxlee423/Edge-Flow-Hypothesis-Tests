@@ -6,10 +6,9 @@ clear
 parameters.distribution = 'Gaussian';
 
 % test
-parameters.test = 'test1_seperated';
-% parameters.test = 'test2_seperated';
-% parameters.test = 'test3_seperated';
-% parameters.test = 'test_united';
+parameters.test = {'test1_seperated', 'test2_seperated', 'test3_with_test1'};
+%do the quick dubug test
+% parameters.test = {'simple_test_debug', 'simple_test_debug', 'simple_test_debug'};
 
 %subgraph_mode
 parameters.subgraph_mode = '0001001101011110'; % Subgraph code
