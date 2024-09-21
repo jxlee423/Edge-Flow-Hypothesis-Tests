@@ -83,6 +83,9 @@ else
     n_real.flow = parameters.n_real.flow;
 end
 
+base_path_newtxt = 'G:\2024 Summer\EFHT\Synthetic Data Sets\TESTING_NEWTXT';
+base_path_subtxt = 'G:\2024 Summer\EFHT\Synthetic Data Sets\TESTING_SUBTXT';
+
 
 %% draw the graphs
 if strcmp(parameters.graph_mode,'Erdos')
@@ -110,12 +113,8 @@ if strcmp(parameters.graph_mode,'Erdos')
                 Graphs.valid(i,k) = 1;
                 Graphs.edge_to_endpoints{i,k} = connected_Erdos_sampler(N,p);
                 % Generate subgraph edges
-                base_path_newtxt = 'G:\2024 Summer\EFHT\Synthetic Data Sets\TESTING_NEWTXT';
-                base_path_subtxt = 'G:\2024 Summer\EFHT\Synthetic Data Sets\TESTING_SUBTXT';
-
                 input_file = fullfile(base_path_newtxt, sprintf('graph_%d_%d.txt', i, k));
                 output_file_base = fullfile(base_path_subtxt, sprintf('output_%d_%d', i, k));
-
                 generate_txt_from_edges(Graphs.edge_to_endpoints{i,k}, input_file);
                 run_external_program(input_file, output_file_base);
                 output_file = sprintf('%s_sub.txt', output_file_base);
@@ -156,12 +155,8 @@ elseif strcmp(parameters.graph_mode,'Small World') % (Wattz Strogatz) standard r
                 graph_struct = WattsStrogatz(N,K,beta);
                 Graphs.edge_to_endpoints{i,k} = table2array(graph_struct.Edges);
                 % Generate subgraph edges
-                base_path_newtxt = 'G:\2024 Summer\EFHT\Synthetic Data Sets\TESTING_NEWTXT';
-                base_path_subtxt = 'G:\2024 Summer\EFHT\Synthetic Data Sets\TESTING_SUBTXT';
-
                 input_file = fullfile(base_path_newtxt, sprintf('graph_%d_%d.txt', i, k));
                 output_file_base = fullfile(base_path_subtxt, sprintf('output_%d_%d', i, k));
-
                 generate_txt_from_edges(Graphs.edge_to_endpoints{i,k}, input_file);
                 run_external_program(input_file, output_file_base);
                 output_file = sprintf('%s_sub.txt', output_file_base);
@@ -205,12 +200,8 @@ elseif strcmp(parameters.graph_mode,'Scale Free') % standard random graph family
                 Graphs.valid(i,k) = 1;
                 [Graphs.edge_to_endpoints{i,k},~] = ADJUSTED_fixed_degree_distribution_sampler(N,degree_dist);
                 % Generate subgraph edges
-                base_path_newtxt = 'G:\2024 Summer\EFHT\Synthetic Data Sets\TESTING_NEWTXT';
-                base_path_subtxt = 'G:\2024 Summer\EFHT\Synthetic Data Sets\TESTING_SUBTXT';
-
                 input_file = fullfile(base_path_newtxt, sprintf('graph_%d_%d.txt', i, k));
                 output_file_base = fullfile(base_path_subtxt, sprintf('output_%d_%d', i, k));
-
                 generate_txt_from_edges(Graphs.edge_to_endpoints{i,k}, input_file);
                 run_external_program(input_file, output_file_base);
                 output_file = sprintf('%s_sub.txt', output_file_base);
@@ -255,12 +246,8 @@ elseif strcmp(parameters.graph_mode,'Block Stochastic') % community structure, c
             Graphs.valid(i,k) = 1;
             [Graphs.edge_to_endpoints{i,k},classes{i}] = stochastic_block_sampler(community_size_list,P);
             % Generate subgraph edges
-                base_path_newtxt = 'G:\2024 Summer\EFHT\Synthetic Data Sets\TESTING_NEWTXT';
-                base_path_subtxt = 'G:\2024 Summer\EFHT\Synthetic Data Sets\TESTING_SUBTXT';
-
                 input_file = fullfile(base_path_newtxt, sprintf('graph_%d_%d.txt', i, k));
                 output_file_base = fullfile(base_path_subtxt, sprintf('output_%d_%d', i, k));
-
                 generate_txt_from_edges(Graphs.edge_to_endpoints{i,k}, input_file);
                 run_external_program(input_file, output_file_base);
                 output_file = sprintf('%s_sub.txt', output_file_base);
@@ -302,12 +289,8 @@ elseif strcmp(parameters.graph_mode,'Near Complete Bipartite') % cross community
             Graphs.valid(i,k) = 1;
             Graphs.edge_to_endpoints{i,k} = near_complete_bipartite_sampler(N,M,p_inter,p_intra);
             % Generate subgraph edges
-                base_path_newtxt = 'G:\2024 Summer\EFHT\Synthetic Data Sets\TESTING_NEWTXT';
-                base_path_subtxt = 'G:\2024 Summer\EFHT\Synthetic Data Sets\TESTING_SUBTXT';
-
                 input_file = fullfile(base_path_newtxt, sprintf('graph_%d_%d.txt', i, k));
                 output_file_base = fullfile(base_path_subtxt, sprintf('output_%d_%d', i, k));
-
                 generate_txt_from_edges(Graphs.edge_to_endpoints{i,k}, input_file);
                 run_external_program(input_file, output_file_base);
                 output_file = sprintf('%s_sub.txt', output_file_base);
@@ -338,12 +321,8 @@ elseif strcmp(parameters.graph_mode,'One-D Spatial') % sample along line with ga
             Graphs.valid(i,k) = 1;
             Graphs.edge_to_endpoints{i,k} = Line_Gaussian_Kernel_sampler(N,sigma);
             % Generate subgraph edges
-                base_path_newtxt = 'G:\2024 Summer\EFHT\Synthetic Data Sets\TESTING_NEWTXT';
-                base_path_subtxt = 'G:\2024 Summer\EFHT\Synthetic Data Sets\TESTING_SUBTXT';
-
                 input_file = fullfile(base_path_newtxt, sprintf('graph_%d_%d.txt', i, k));
                 output_file_base = fullfile(base_path_subtxt, sprintf('output_%d_%d', i, k));
-
                 generate_txt_from_edges(Graphs.edge_to_endpoints{i,k}, input_file);
                 run_external_program(input_file, output_file_base);
                 output_file = sprintf('%s_sub.txt', output_file_base);
@@ -375,12 +354,8 @@ elseif strcmp(parameters.graph_mode,'Two-D Spatial') % sample on lattice with ga
             Graphs.valid(i,k) = 1;
             Graphs.edge_to_endpoints{i,k} = Grid_Gaussian_Kernel_sampler(N,sigma);
             % Generate subgraph edges
-                base_path_newtxt = 'G:\2024 Summer\EFHT\Synthetic Data Sets\TESTING_NEWTXT';
-                base_path_subtxt = 'G:\2024 Summer\EFHT\Synthetic Data Sets\TESTING_SUBTXT';
-
                 input_file = fullfile(base_path_newtxt, sprintf('graph_%d_%d.txt', i, k));
                 output_file_base = fullfile(base_path_subtxt, sprintf('output_%d_%d', i, k));
-
                 generate_txt_from_edges(Graphs.edge_to_endpoints{i,k}, input_file);
                 run_external_program(input_file, output_file_base);
                 output_file = sprintf('%s_sub.txt', output_file_base);
@@ -450,7 +425,9 @@ n_averaging_params = length(parameters.cov.correlation_ds)*length(parameters.cov
 %% preallocate space for output
 Flows = cell(n_graph_params,n_graph_real,n_rhos,n_averaging_params);
 
-Test_Results = cell(size(Flows));
+Test_Results.test1 = cell(size(Flows));  % Test 1
+Test_Results.test2 = cell(size(Flows));  % Test 2
+Test_Results.test3 = cell(size(Flows));  % Test 3
 
 Effect_sizes = nan(n_rhos,n_averaging_params,3); % entries of each cell are max violation on the diagonal, off the diagonal disjoint, off the diagonal connected
 
@@ -570,8 +547,19 @@ for i = 1:n_graph_params
 
                     end
                     %% calculate test-pass rate
-                    pass_rate = perform_test(Flows{i,k,j,l}, subgraph_edges, parameters.test);
-                    Test_Results{i,k,j,l} = pass_rate;
+                    % Test 1
+                    pass_rate_test1 = perform_test(Flows{i, k, j, l}, subgraph_edges, parameters.test{1});
+                    Test_Results.test1{i, k, j, l} = pass_rate_test1;
+    
+                    % Test 2
+                    pass_rate_test2 = perform_test(Flows{i, k, j, l}, subgraph_edges, parameters.test{2});
+                    Test_Results.test2{i, k, j, l} = pass_rate_test2;
+    
+                    % Test 3
+                    pass_rate_test3 = perform_test(Flows{i, k, j, l}, subgraph_edges, parameters.test{3});
+                    Test_Results.test3{i, k, j, l} = pass_rate_test3;
+
+
                     %% store settings
                     if cov_dist <= 1 || cov_averaging_weight == 0
                         Cov_settings.null_is_true(l) = 1;
