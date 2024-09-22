@@ -83,8 +83,7 @@ else
     n_real.flow = parameters.n_real.flow;
 end
 
-base_path_newtxt = 'G:\2024 Summer\EFHT\Synthetic Data Sets\TESTING_NEWTXT';
-base_path_subtxt = 'G:\2024 Summer\EFHT\Synthetic Data Sets\TESTING_SUBTXT';
+
 
 
 %% draw the graphs
@@ -113,12 +112,7 @@ if strcmp(parameters.graph_mode,'Erdos')
                 Graphs.valid(i,k) = 1;
                 Graphs.edge_to_endpoints{i,k} = connected_Erdos_sampler(N,p);
                 % Generate subgraph edges
-                input_file = fullfile(base_path_newtxt, sprintf('graph_%d_%d.txt', i, k));
-                output_file_base = fullfile(base_path_subtxt, sprintf('output_%d_%d', i, k));
-                generate_txt_from_edges(Graphs.edge_to_endpoints{i,k}, input_file);
-                run_external_program(input_file, output_file_base);
-                output_file = sprintf('%s_sub.txt', output_file_base);
-                Graphs.subgraph_edges{i,k} = subgraph_selecting(output_file, Graphs.edge_to_endpoints{i,k},parameters.subgraph_mode); % Store subgraph edges
+
             end
         else % avoid sampling cases when the graph will almost never be connected
             for k = 1:n_real.graph
@@ -155,12 +149,6 @@ elseif strcmp(parameters.graph_mode,'Small World') % (Wattz Strogatz) standard r
                 graph_struct = WattsStrogatz(N,K,beta);
                 Graphs.edge_to_endpoints{i,k} = table2array(graph_struct.Edges);
                 % Generate subgraph edges
-                input_file = fullfile(base_path_newtxt, sprintf('graph_%d_%d.txt', i, k));
-                output_file_base = fullfile(base_path_subtxt, sprintf('output_%d_%d', i, k));
-                generate_txt_from_edges(Graphs.edge_to_endpoints{i,k}, input_file);
-                run_external_program(input_file, output_file_base);
-                output_file = sprintf('%s_sub.txt', output_file_base);
-                Graphs.subgraph_edges{i,k} = subgraph_selecting(output_file, Graphs.edge_to_endpoints{i,k},parameters.subgraph_mode); % Store subgraph edges
             end
         else % avoid sampling cases when the graph will almost never be connected
             for k = 1:n_real.graph
@@ -200,12 +188,6 @@ elseif strcmp(parameters.graph_mode,'Scale Free') % standard random graph family
                 Graphs.valid(i,k) = 1;
                 [Graphs.edge_to_endpoints{i,k},~] = ADJUSTED_fixed_degree_distribution_sampler(N,degree_dist);
                 % Generate subgraph edges
-                input_file = fullfile(base_path_newtxt, sprintf('graph_%d_%d.txt', i, k));
-                output_file_base = fullfile(base_path_subtxt, sprintf('output_%d_%d', i, k));
-                generate_txt_from_edges(Graphs.edge_to_endpoints{i,k}, input_file);
-                run_external_program(input_file, output_file_base);
-                output_file = sprintf('%s_sub.txt', output_file_base);
-                Graphs.subgraph_edges{i,k} = subgraph_selecting(output_file, Graphs.edge_to_endpoints{i,k},parameters.subgraph_mode); % Store subgraph edges
             end
         else
             for k = 1:n_real.graph
@@ -246,12 +228,6 @@ elseif strcmp(parameters.graph_mode,'Block Stochastic') % community structure, c
             Graphs.valid(i,k) = 1;
             [Graphs.edge_to_endpoints{i,k},classes{i}] = stochastic_block_sampler(community_size_list,P);
             % Generate subgraph edges
-                input_file = fullfile(base_path_newtxt, sprintf('graph_%d_%d.txt', i, k));
-                output_file_base = fullfile(base_path_subtxt, sprintf('output_%d_%d', i, k));
-                generate_txt_from_edges(Graphs.edge_to_endpoints{i,k}, input_file);
-                run_external_program(input_file, output_file_base);
-                output_file = sprintf('%s_sub.txt', output_file_base);
-                Graphs.subgraph_edges{i,k} = subgraph_selecting(output_file, Graphs.edge_to_endpoints{i,k},parameters.subgraph_mode); % Store subgraph edges
         end
     end
 
@@ -289,12 +265,7 @@ elseif strcmp(parameters.graph_mode,'Near Complete Bipartite') % cross community
             Graphs.valid(i,k) = 1;
             Graphs.edge_to_endpoints{i,k} = near_complete_bipartite_sampler(N,M,p_inter,p_intra);
             % Generate subgraph edges
-                input_file = fullfile(base_path_newtxt, sprintf('graph_%d_%d.txt', i, k));
-                output_file_base = fullfile(base_path_subtxt, sprintf('output_%d_%d', i, k));
-                generate_txt_from_edges(Graphs.edge_to_endpoints{i,k}, input_file);
-                run_external_program(input_file, output_file_base);
-                output_file = sprintf('%s_sub.txt', output_file_base);
-                Graphs.subgraph_edges{i,k} = subgraph_selecting(output_file, Graphs.edge_to_endpoints{i,k},parameters.subgraph_mode); % Store subgraph edges
+
         end
     end
 
@@ -321,12 +292,7 @@ elseif strcmp(parameters.graph_mode,'One-D Spatial') % sample along line with ga
             Graphs.valid(i,k) = 1;
             Graphs.edge_to_endpoints{i,k} = Line_Gaussian_Kernel_sampler(N,sigma);
             % Generate subgraph edges
-                input_file = fullfile(base_path_newtxt, sprintf('graph_%d_%d.txt', i, k));
-                output_file_base = fullfile(base_path_subtxt, sprintf('output_%d_%d', i, k));
-                generate_txt_from_edges(Graphs.edge_to_endpoints{i,k}, input_file);
-                run_external_program(input_file, output_file_base);
-                output_file = sprintf('%s_sub.txt', output_file_base);
-                Graphs.subgraph_edges{i,k} = subgraph_selecting(output_file, Graphs.edge_to_endpoints{i,k},parameters.subgraph_mode); % Store subgraph edges
+
         end
     end
 
@@ -354,12 +320,7 @@ elseif strcmp(parameters.graph_mode,'Two-D Spatial') % sample on lattice with ga
             Graphs.valid(i,k) = 1;
             Graphs.edge_to_endpoints{i,k} = Grid_Gaussian_Kernel_sampler(N,sigma);
             % Generate subgraph edges
-                input_file = fullfile(base_path_newtxt, sprintf('graph_%d_%d.txt', i, k));
-                output_file_base = fullfile(base_path_subtxt, sprintf('output_%d_%d', i, k));
-                generate_txt_from_edges(Graphs.edge_to_endpoints{i,k}, input_file);
-                run_external_program(input_file, output_file_base);
-                output_file = sprintf('%s_sub.txt', output_file_base);
-                Graphs.subgraph_edges{i,k} = subgraph_selecting(output_file, Graphs.edge_to_endpoints{i,k},parameters.subgraph_mode); % Store subgraph edges
+
         end
     end
 end
@@ -369,6 +330,27 @@ parameters.graph_param_grid = parameter_grid;
 
 %% print
 fprintf('\n\n Graphs Complete! \n')
+
+base_path_newtxt = 'G:\2024 Summer\EFHT\Synthetic Data Sets\TESTING_NEWTXT';
+base_path_subtxt = 'G:\2024 Summer\EFHT\Synthetic Data Sets\TESTING_SUBTXT';
+
+for i = 1:prod(parameter_grid.size)
+    for k = 1:n_real.graph
+        if Graphs.valid(i,k) == 0
+            Graphs.edge_to_endpoints{i,k} = nan;
+            continue; 
+        end
+        
+        input_file = fullfile(base_path_newtxt, sprintf('graph_%d_%d.txt', i, k));
+        output_file_base = fullfile(base_path_subtxt, sprintf('output_%d_%d', i, k));
+        
+        generate_txt_from_edges(Graphs.edge_to_endpoints{i,k}, input_file);
+        gtrieScanner_mex(input_file, output_file_base);
+        
+        output_file = sprintf('%s_sub.txt', output_file_base);
+        Graphs.subgraph_edges{i,k} = subgraph_selecting(output_file, Graphs.edge_to_endpoints{i,k}, parameters.subgraph_mode);  % Store subgraph edges
+    end
+end
 
 
 %% sample flows
@@ -404,6 +386,8 @@ Examples.Effect_sizes = Effect_sizes; % store the maximum violation of the null 
 fprintf('\n\n Flows Complete! \n')
 
 end
+
+
 
 function [Flows, Effect_sizes, Cov_settings, Test_Results] = Flow_Sampler(Graphs, parameters)
 
@@ -630,21 +614,4 @@ effect_size(3) = max(max(off_diag_disc(A_edge ~= 0)));
 
 end
 
-function generate_txt_from_edges(edge_data, input_file)
-    fileID = fopen(input_file, 'w');
-    
-    if fileID == -1
-        error(['Unable to create file: ', input_file]); 
-    end
-    
-    for i = 1:size(edge_data, 1)
-        fprintf(fileID, '%d %d\n', edge_data(i, 1), edge_data(i, 2));
-    end
-    fclose(fileID);
 
-end
-
-function run_external_program(input_file, output_file_base)
-    % Call the MEX file to run gtrieScanner
-    gtrieScanner_mex(input_file, output_file_base);
-end
