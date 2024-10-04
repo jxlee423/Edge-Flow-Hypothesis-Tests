@@ -25,8 +25,8 @@ tline = fgetl(fileID);
 while ischar(tline)
     parts = strsplit(tline, ':'); % Split the line into subgraph code and points list
     if length(parts) == 2 && strcmp(strtrim(parts{1}), '0001001101011110')
-        % Randomly decide whether to extract this target (30% chance)
-        if rand() <= 0.3  % 30% probability
+        % Randomly decide whether to extract this target (80% chance)
+        if rand() <= 0.8  % 80% probability
             % Remove whitespaces after the subgraph code and then split out point information
             points_str = strsplit(strtrim(parts{2}), ' ');
             points = str2double(points_str);

@@ -186,7 +186,7 @@ elseif strcmp(parameters.graph_mode,'Scale Free') % standard random graph family
         if d_min <= N-1
             for k = 1:n_real.graph
                 Graphs.valid(i,k) = 1;
-                [Graphs.edge_to_endpoints{i,k},~] = ADJUSTED_fixed_degree_distribution_sampler(N,degree_dist);
+                [Graphs.edge_to_endpoints{i,k},~] = EDITTED_fixed_degree_distribution_sampler(N,degree_dist);
                 % Generate subgraph edges
             end
         else
@@ -531,18 +531,11 @@ for i = 1:n_graph_params
 
                     end
                     %% calculate test-pass rate
-                    % Test 1
-                    pass_rate_test1 = perform_test(Flows{i, k, j, l}, subgraph_edges, parameters.test{1});
-                    Test_Results.test1{i, k, j, l} = pass_rate_test1;
-    
-                    % Test 2
-                    pass_rate_test2 = perform_test(Flows{i, k, j, l}, subgraph_edges, parameters.test{2});
-                    Test_Results.test2{i, k, j, l} = pass_rate_test2;
-    
-                    % Test 3
-                    pass_rate_test3 = perform_test(Flows{i, k, j, l}, subgraph_edges, parameters.test{3});
-                    Test_Results.test3{i, k, j, l} = pass_rate_test3;
-
+                    pass_rates = perform_test(Flows{i, k, j, l}, subgraph_edges, parameters.test);
+                    
+                    Test_Results.test1{i, k, j, l} = pass_rates(1);
+                    Test_Results.test2{i, k, j, l} = pass_rates(2);
+                    Test_Results.test3{i, k, j, l} = pass_rates(3);
 
                     %% store settings
                     if cov_dist <= 1 || cov_averaging_weight == 0
