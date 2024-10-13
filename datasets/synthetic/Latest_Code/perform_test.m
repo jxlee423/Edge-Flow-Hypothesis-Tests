@@ -28,8 +28,8 @@ for col = 1:num_tests
         % for test that needs covariance_bootstrap
         if need_covariance_bootstrap
             % Compute covariance matrix and bootstrap confidence interval matrix only once
-            cov_matrix = cov(subgraph_flows);
-            ci_matrix = bootstrap_cov_matrix(cov_matrix);
+            ci_matrix = bootstrap_cov_matrix(subgraph_flows);
+            % fprintf('Pause for No.%d of %d tests\n', col,num_tests);
         end
 
         % Perform corresponding test for each test mode
@@ -63,6 +63,8 @@ for col = 1:num_tests
 end
 % Calculate the pass rate for each test mode
 pass_rate = num_passes / num_tests;
+% disp('pass_rate:');
+% disp(pass_rate);
 end
 
 % Perform tests on flow data and return the pass rate
@@ -259,7 +261,8 @@ function subgraph_flows = extract_subgraph_flows(flow_column, subgraph_edges)
             subgraph_flows = [subgraph_flows; subgraph_flow'];
         end
     end
-
+    % disp('Current subgraph_flows:');
+    % disp(subgraph_flows);
 end
 
 function ci_matrix = bootstrap_cov_matrix(subgraph_flows)
@@ -294,6 +297,13 @@ function ci_matrix = bootstrap_cov_matrix(subgraph_flows)
             ci_matrix(j, k, :) = prctile(cov_samples, [2.5, 97.5]);
         end
     end
+    % % Display the confidence intervals
+    % disp('95% Confidence Intervals for Covariance Matrix:');
+    % for j = 1:p
+    %     for k = 1:p
+    %         fprintf('Covariance between edge %d and edge %d: [%.5f, %.5f]\n', j, k, ci_matrix(j, k, 1), ci_matrix(j, k, 2));
+    %     end
+    % end
 end
 
 function diagonal_ci = diagonal_ci(ci_matrix)
