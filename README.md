@@ -3,16 +3,11 @@
 Welcome to the **Edge Flow Hypothesis Tests** repository. This project focuses on hypothesis testing in edge flows and includes various datasets, covariance matrices, and confidence interval computations.
 
 ## 📚 Project Structure
-
-### 1. `CI` Folder
-- Contains covariance matrices.
-- Includes bootstrapped confidence intervals derived from the data.
-
-### 2. `Datasets` Folder
+### 1. `Datasets` Folder
 - Houses all datasets related to this project:
   - **Processed Datasets**
   - **Raw Datasets**
-  - **Synthetic Datasets**
+  - **Synthetic Datasets**: the code to generate these datasets is also stored here.
 
 ## 🛠️ Setup Instructions
 
@@ -33,6 +28,4 @@ The following tasks are planned for future development:
 - **Enhanced Documentation**: Step-by-step guides for using the tools and interpreting results.
 
 ## 📂 Folders and Files Overview
-
-- `CI/`: Contains all covariance matrices and the resulting bootstrapped confidence intervals.
 - `Datasets/`: Stores processed, raw, and synthetic datasets used in the analysis.
