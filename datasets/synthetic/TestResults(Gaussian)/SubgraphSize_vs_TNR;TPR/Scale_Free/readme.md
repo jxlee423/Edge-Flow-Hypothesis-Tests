@@ -1,1 +1,0 @@
-Graph Family = Scale Free
