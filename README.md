@@ -3,11 +3,21 @@
 Welcome to the **Edge Flow Hypothesis Tests** repository. This project focuses on hypothesis testing in edge flows and includes various datasets, covariance matrices, and confidence interval computations.
 
 ## 📚 Project Structure
-### 1. `Datasets` Folder
-- Houses all datasets related to this project:
+### 1. `Synthetic Dataset` Folder
+- Houses Synthetic datasets related to this project.
+### 2. `Real-World Datasets` Folder
+- Houses Real-World datasets related to this project:
   - **Processed Datasets**
   - **Raw Datasets**
-  - **Synthetic Datasets**: the code to generate these datasets is also stored here.
+### 3. `Data Analysis` Folder
+- houses all data analysis related to this project:
+  - **Gaussian distribution**
+  - **Laplace distribution**
+  - **Student T distribution**
+  - **Uniform distribution**
+### 4. `Code` Folder
+- houses code and setup instructions related to this project:
+
 
 ## 🛠️ Setup Instructions
 
