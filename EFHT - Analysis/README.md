@@ -22,8 +22,8 @@ EFHT-Analysis/
 ├── data/
 │   
 |
-├── notebooks/
-│   └── Standard Testing Pipeline.ipynb         # A Jupyter notebook to run the pipeline on multiple datasets.
+├── Standard Testing Pipeline.ipynb
+│
 |
 ├── outputs/
 │   └── (This folder is created automatically to store all results)
@@ -37,9 +37,8 @@ EFHT-Analysis/
 │       ├── bivariate.py      # Bivariate Equivalence Test logic.
 │       ├── Independence.py   # Independence Test logic.
 │       ├── ks.py             # K-S Test logic.
-│       └── Levene_anova.py   # Levene's and ANOVA/t-test logic.
+│       └── config.py                 # Central configuration file for all parameters.
 |
-├── config.py                 # Central configuration file for all parameters.
 ├── main.py                   # The main entry point to run the entire analysis pipeline.
 ├── requirements.txt          # A list of all required Python packages for the project.
 └── README.md                 # This documentation file.
