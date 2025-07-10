@@ -1,5 +1,4 @@
 import numpy as np
-import pandas as pd
 import matplotlib.pyplot as plt
 from sklearn.neighbors import NearestNeighbors
 from sklearn.model_selection import KFold
@@ -15,10 +14,11 @@ def run_independence_test(df_reflected, config, results_manager):
     TOP_N_COLORS = config.INDEPENDENCE_TOP_N_COLORS
     EPSILON = config.EPSILON
     GRID_SIZE = config.INDEPENDENCE_GRID_SIZE
+    EXTEND_RATIO = config.INDEPENDENCE_EXTEND_RATIO 
     RANDOM_STATE = config.RANDOM_STATE
     alpha = config.ALPHA
     
-    # --- 2. Define internal classes and helper functions (encapsulate logic) ---
+    # --- 2. Define plotting and helper functions ---
     def unified_knn_density(query_points, knn_model, k, dim):
         if query_points.shape[0] == 0:
             return np.array([])
@@ -51,9 +51,14 @@ def run_independence_test(df_reflected, config, results_manager):
             x_reshaped = np.array(x).reshape(-1, 1)
             return unified_knn_density(x_reshaped, self.knn, self.k, dim=1)
             
-        def compute_cdf(self, GRID_SIZE):
+        def compute_cdf(self, GRID_SIZE, extend_ratio):
             """Numerically compute CDF and create interpolation function"""
-            grid = np.linspace(self.X.min(), self.X.max(), GRID_SIZE)
+            data_min = self.X.min()
+            data_max = self.X.max()
+            data_range = data_max - data_min
+            grid_min = data_min - extend_ratio * data_range
+            grid_max = data_max + extend_ratio * data_range
+            grid = np.linspace(grid_min, grid_max, GRID_SIZE)
             pdf_values = self.pdf(grid)
             cdf_values = np.cumsum(pdf_values) * (grid[1] - grid[0])
             cdf_values /= cdf_values[-1]
@@ -128,6 +133,102 @@ def run_independence_test(df_reflected, config, results_manager):
                 cv_scores[k] = np.mean(fold_log_likelihoods)
         
         return max(cv_scores, key=cv_scores.get) if cv_scores else k_candidates[0]
+    
+    # ================== plotting helper function ==================
+    
+    def plot_scatter(current_edges, non_current_edges, color, results_manager):
+        fig, ax = plt.subplots(figsize=(8, 8))
+        ax.scatter(
+            non_current_edges['flowX'], 
+            non_current_edges['flowY'], 
+            label='Other Colors (Baseline)', 
+            color='purple', 
+            alpha=0.6 
+        )
+        ax.scatter(
+            current_edges['flowX'], 
+            current_edges['flowY'], 
+            label=f'Color {color} Data', 
+            color='red',
+            alpha=0.6
+        )
+        ax.set_xlabel('flowX')
+        ax.set_ylabel('flowY')
+        ax.set_title(f'Data Scatter Plot: Color {color} vs. Others')
+        ax.legend()
+        ax.grid(True)
+        ax.set_aspect('equal', adjustable='box')
+        fig.tight_layout()
+        color_test_name = f"independence_test/color_{color}"
+        results_manager.save_plot(fig, "scatter_plot.png", test_name=color_test_name)
+        
+    def plot_kl_distribution(null_kls, obs_kl, p_value, color, results_manager):
+        fig, ax = plt.subplots(figsize=(10, 6))
+        ax.hist(null_kls, bins=30, alpha=0.7, label='Null Distribution')
+        ax.axvline(obs_kl, color='r', linestyle='--', label=f'Observed KL = {obs_kl:.4f}')
+        ax.set_title(f'Independence Test for Color {color} (p-value = {p_value:.4f})')
+        ax.set_xlabel('KL Divergence')
+        ax.set_ylabel('Frequency')
+        ax.legend()
+        fig.tight_layout()
+        color_test_name = f"independence_test/color_{color}"
+        results_manager.save_plot(fig, "kl_distribution.png", test_name=color_test_name)
+    
+    def plot_2d_density_comparison(knn_joint, k_joint, marginal_estimator, current_edges, color, results_manager):
+        # 1. Create a 2D grid covering the data range
+        x = current_edges['flowX']
+        y = current_edges['flowY']
+        
+        all_values = np.concatenate([x, y])
+        axis_min, axis_max = all_values.min(), all_values.max()
+        
+        x_grid = np.linspace(axis_min, axis_max, 100)
+        y_grid = np.linspace(axis_min, axis_max, 100)
+        
+        XX, YY = np.meshgrid(x_grid, y_grid)
+        grid_points = np.c_[XX.ravel(), YY.ravel()]
+
+        # 2. P_joint density on the grid
+        Z_joint = unified_knn_density(grid_points, knn_joint, k_joint, dim=2).reshape(XX.shape)
+
+        # 3. P_product density on the grid
+        p_prod_x = marginal_estimator.pdf(grid_points[:, 0])
+        p_prod_y = marginal_estimator.pdf(grid_points[:, 1])
+        Z_product = (p_prod_x * p_prod_y).reshape(XX.shape)
+        
+        # 4. Plot
+        fig, axes = plt.subplots(1, 3, figsize=(24, 7))
+        
+        for ax in axes:
+            ax.set_xlabel('flowX')
+            ax.set_aspect('equal', adjustable='box')
+            ax.set_xlim(axis_min, axis_max)
+            ax.set_ylim(axis_min, axis_max)
+            ax.grid(True)
+
+        axes[0].set_ylabel('flowY')
+
+        # Figure 1: P_joint (real joint distribution)
+        cp1 = axes[0].contourf(XX, YY, Z_joint, levels=20, cmap='viridis')
+        fig.colorbar(cp1, ax=axes[0])
+        axes[0].set_title(f'P_joint for Color {color}\n(Observed Joint Density)')
+
+        # Figure 2: P_product (Distribution under the assumption of independence)
+        cp2 = axes[1].contourf(XX, YY, Z_product, levels=20, cmap='viridis')
+        fig.colorbar(cp2, ax=axes[1])
+        axes[1].set_title(f'P_product (from Others)\n(Independent Model Density)')
+
+        # Figure 3: Variance map (log(P_joint / P_product))
+        log_ratio = np.log(Z_joint + EPSILON) - np.log(Z_product + EPSILON)
+        max_abs = np.max(np.abs(log_ratio))
+        cp3 = axes[2].contourf(XX, YY, log_ratio, levels=20, cmap='coolwarm', vmin=-max_abs, vmax=max_abs)
+        fig.colorbar(cp3, ax=axes[2])
+        axes[2].set_title(f'Log Ratio: log(P_joint / P_product)')
+
+        fig.tight_layout()
+        
+        color_test_name = f"independence_test/color_{color}"
+        results_manager.save_plot(fig, "2d_density_comparison.png", test_name=color_test_name)
 
     # --- 3. Filter color groups to be tested ---
     color_counts = df_reflected['color'].value_counts()
@@ -167,7 +268,7 @@ def run_independence_test(df_reflected, config, results_manager):
         # b. Estimate the marginal distribution
         marginal_estimator = MarginalEstimator(k=optimal_k_marginal)
         marginal_estimator.fit(marginal_train_data)
-        marginal_estimator.compute_cdf(GRID_SIZE)
+        marginal_estimator.compute_cdf(GRID_SIZE, EXTEND_RATIO)
         
         # c. Estimate the joint distribution
         knn_joint = NearestNeighbors(n_neighbors=optimal_k_joint).fit(joint_train_data)
@@ -180,9 +281,23 @@ def run_independence_test(df_reflected, config, results_manager):
         # e. Simulate the null distribution
         def simulate_kl_divergence_job(seed):
             job_rng = np.random.default_rng(seed)
-            sim_samples = sample_product_distribution(marginal_estimator, len(current_edges), job_rng)
-            knn_sim = NearestNeighbors(n_neighbors=optimal_k_joint).fit(sim_samples)
-            return compute_kl_divergence(sim_samples, marginal_estimator, knn_sim, optimal_k_joint)
+            
+            # 1. Generate twice as many samples
+            n_total_samples = len(current_edges) * 2
+            all_sim_samples = sample_product_distribution(marginal_estimator, n_total_samples, job_rng)
+            
+            # 2. Split the sample in half
+            # training
+            train_samples = all_sim_samples[:len(current_edges)]
+            # evaluation/testing
+            eval_samples = all_sim_samples[len(current_edges):]
+            
+            # 3. Fit a new KNN model using training samples
+            # This model has never been seen eval_samples
+            knn_sim = NearestNeighbors(n_neighbors=optimal_k_joint).fit(train_samples)
+            
+            # 4. Use evaluation samples to calculate KL
+            return compute_kl_divergence(eval_samples, marginal_estimator, knn_sim, optimal_k_joint)
         
         # Generate unique, reproducible seeds for each parallel task
         seeds = [RANDOM_STATE + i for i in range(N_SIMULATIONS)]
@@ -194,49 +309,18 @@ def run_independence_test(df_reflected, config, results_manager):
 
         # e. Calculate the p-value
         p_value = (np.sum(np.array(null_kls) >= obs_kl) + 1) / (N_SIMULATIONS + 1)
-
-        # f. Save results and plots for this color group
-        fig_scatter, ax_scatter = plt.subplots(figsize=(8, 8))
         
-        # Scatter Plot
-        ax_scatter.scatter(
-            non_current_edges['flowX'], 
-            non_current_edges['flowY'], 
-            label='Other Colors (Baseline)', 
-            color='purple', 
-            alpha=0.7 
+        # f. Generating visualizations
+        plot_scatter(current_edges, non_current_edges, color, results_manager)
+        plot_kl_distribution(null_kls, obs_kl, p_value, color, results_manager)
+        plot_2d_density_comparison(
+            knn_joint, 
+            optimal_k_joint, 
+            marginal_estimator, 
+            current_edges, 
+            color, 
+            results_manager
         )
-
-        ax_scatter.scatter(
-            current_edges['flowX'], 
-            current_edges['flowY'], 
-            label=f'Color {color} Data', 
-            color='red',
-            alpha=0.7
-        )
-
-        ax_scatter.set_xlabel('flowX')
-        ax_scatter.set_ylabel('flowY')
-        ax_scatter.set_title(f'Data Scatter Plot: Color {color} vs. Others')
-        ax_scatter.legend()
-        ax_scatter.grid(True)
-        ax_scatter.set_aspect('equal', adjustable='box')
-        fig_scatter.tight_layout()
-
-        # Null Distribution Plot
-        fig_kl, ax_kl = plt.subplots(figsize=(10, 6))
-        ax_kl.hist(null_kls, bins=30, alpha=0.7, label='Null Distribution')
-        ax_kl.axvline(obs_kl, color='r', linestyle='--', label=f'Observed KL = {obs_kl:.4f}')
-        ax_kl.set_title(f'Independence Test for Color {color} (p-value = {p_value:.4f})')
-        ax_kl.set_xlabel('KL Divergence')
-        ax_kl.set_ylabel('Frequency')
-        ax_kl.legend()
-        fig_kl.tight_layout()
-        
-        color_test_name = f"independence_test/color_{color}"    
-        results_manager.save_plot(fig_kl, "kl_distribution.png", test_name=color_test_name)
-        results_manager.save_plot(fig_scatter, "scatter_plot.png", test_name=color_test_name)
-        
         
         color_result = {
         'color': int(color),
@@ -248,19 +332,17 @@ def run_independence_test(df_reflected, config, results_manager):
         'k_candidates_marginal': [int(k) for k in k_candidates_marginal],
         'k_candidates_joint': [int(k) for k in k_candidates_joint]
     }
-        results_manager.save_json(color_result, "result.json", test_name=color_test_name)
-        
-        # Add the result for this color group to the main report
-        results_manager.add_to_report(f"Independence Test (Color: {color})", p_value, params=f"K_marg={optimal_k_marginal}, K_joint={optimal_k_joint}, n_samples={len(current_edges)}")
+        results_manager.save_json(color_result, "result.json", test_name=f"independence_test/color_{color}")
+        results_manager.add_to_report(f"Independence Test (Color: {color})", p_value, alpha/9, params=f"K_marg={optimal_k_marginal}, K_joint={optimal_k_joint}, n_samples={len(current_edges)}")
         
         print(f"\n--- Independence Test Result for Color: {color} ---")
         print(f"P value: {p_value:.4f}")
         
-        if p_value < alpha:
-            print(f"Conclusion: Reject the null hypothesis (p < {alpha}).")
+        if p_value < alpha/9:
+            print(f"Conclusion: Reject the null hypothesis (p < {alpha/9}).")
             print("           The variables 'flowX' and 'flowY' are likely DEPENDENT for this color group.")
         else:
-            print(f"Conclusion: Fail to reject the null hypothesis (p >= {alpha}).")
+            print(f"Conclusion: Fail to reject the null hypothesis (p >= {alpha/9}).")
             print("           There is no significant evidence that 'flowX' and 'flowY' are dependent.")
             
         all_results.append(color_result)
