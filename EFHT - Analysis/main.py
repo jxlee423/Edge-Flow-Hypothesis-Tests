@@ -1,10 +1,9 @@
 import argparse
 import pandas as pd
-import os
-import config
+from src import config
 from src.results_manager import ResultsManager
 from src import data_preprocess
-from src.tests import ks, bivariate, Levene_anova, Independence
+from src.tests import ks, bivariate, Independence
 
 def main(input_path, dataset_id, batch_id):
     # --- 1. Initialization ---
@@ -14,7 +13,7 @@ def main(input_path, dataset_id, batch_id):
     # --- 2. Load and preprocess data ---
     df_input = pd.read_csv(input_path)
     class_data = data_preprocess.Classifying(df_input)
-    df_class0_KS, df_class1_KS, df_class0_ANOVA, df_class1_ANOVA = data_preprocess.KS_Data_Preprocessing(class_data)
+    df_class0_KS, df_class1_KS = data_preprocess.KS_Data_Preprocessing(class_data)
     df_ind_data = data_preprocess.Coloring(df_input)
     df0, df1, dfAll = data_preprocess.BEDT_Data_Preprocessing(class_data,df_input)
 
@@ -30,24 +29,16 @@ def main(input_path, dataset_id, batch_id):
         results
     )
     
-    print("\n--- 2. Running Levene and ANOVA tests ---")
-    Levene_anova.run_variance_and_mean_tests(
-        df_class0_ANOVA,
-        df_class1_ANOVA,
-        config,
-        results
-    )
-    
     # Independence Test
-    print("\n--- 3. Running Independence tests ---")
+    print("\n--- 2. Running Independence tests ---")
     Independence.run_independence_test(
         df_ind_data,
         config,
         results
     )
 
-    #Bivariate Equivalence Test
-    print("\n--- 4. Running Bivariate Equivalence Test ---")
+    # Bivariate Equivalence Test
+    print("\n--- 3. Running Bivariate Equivalence Test ---")
     bivariate.run_bivariate_test(
         df0,
         df1,
