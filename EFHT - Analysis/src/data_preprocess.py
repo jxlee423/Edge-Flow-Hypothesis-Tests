@@ -129,9 +129,7 @@ def KS_Data_Preprocessing(df):
 
     df_class0_KS = pd.DataFrame({'flow': [abs(f) for f in result[0]]})
     df_class1_KS = pd.DataFrame({'flow': [abs(f) for f in result[1]]})
-    df_class0_ANOVA = pd.DataFrame({'flow': [f for f in result[0]]})
-    df_class1_ANOVA = pd.DataFrame({'flow': [f for f in result[1]]})
-    return df_class0_KS, df_class1_KS, df_class0_ANOVA, df_class1_ANOVA
+    return df_class0_KS, df_class1_KS
 
 # Select edge pairs for Bivariate Test
 def BEDT_Data_Preprocessing(df,dfall):
