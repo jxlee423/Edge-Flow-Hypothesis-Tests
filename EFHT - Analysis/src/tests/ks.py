@@ -43,14 +43,14 @@ def run_ks_test(df_class1_KS, df_class2_KS, config, results_manager):
     #save result
     test_results = {'KS_statistic': KS_statistic, 'p_value': pvalue}
     results_manager.save_json(test_results, "result.json", test_name="ks_test")
-    results_manager.add_to_report("KS Test", pvalue)
+    results_manager.add_to_report("KS Test", pvalue, alpha=alpha/3)
     results_manager.save_plot(fig, "distribution_comparison.png", test_name="ks_test")
     
     print("\nKS Test Result:")
     print(f"KS_statistic D = {KS_statistic:.4f}")
     print(f"P value = {pvalue:.4e}")
-    if pvalue < alpha:
-        print(f"Conclusion: Reject the null hypothesis (p < {alpha}), distributions are different.")
+    if pvalue < alpha/3:
+        print(f"Conclusion: Reject the null hypothesis (p < {alpha/3}), distributions are different.")
     else:
-        print(f"Conclusion: Fail to reject the null hypothesis (p >= {alpha}), distributions may be the same.")
+        print(f"Conclusion: Fail to reject the null hypothesis (p >= {alpha/3}), distributions may be the same.")
     return test_results

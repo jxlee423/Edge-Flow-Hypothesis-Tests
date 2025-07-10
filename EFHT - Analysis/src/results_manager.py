@@ -58,19 +58,14 @@ class ResultsManager:
         fig.savefig(filepath)
         plt.close(fig)
 
-    def save_dataframe(self, df, filename, test_name=None):
-        """Saves a DataFrame as a CSV."""
-        dir_path = self.get_test_dir(test_name) if test_name else self.run_dir
-        filepath = os.path.join(dir_path, filename)
-        df.to_csv(filepath, index=False)
-
-    def add_to_report(self, test_name, p_value, params='N/A'):
+    def add_to_report(self, test_name, p_value, alpha, params='N/A'):
         """Adds a result row to the in-memory summary list."""
-        conclusion = 'Reject H0' if p_value < 0.05 else 'Fail to Reject H0'
+        conclusion = 'Reject H0' if p_value < alpha else 'Fail to Reject H0'
         self.results_summary.append({
             'Test Name': test_name,
-            'Parameters': str(params), # Ensure parameters are strings
+            'Parameters': str(params),
             'P-Value': p_value,
+            'Alpha': alpha,
             'Conclusion': conclusion
         })
     

@@ -1,5 +1,4 @@
 import numpy as np
-import pandas as pd
 import matplotlib.pyplot as plt
 from sklearn.neighbors import NearestNeighbors
 from sklearn.model_selection import KFold
@@ -122,6 +121,81 @@ def run_bivariate_test(D1_df, D2_df, D_all_df, config, results_manager):
         d2_perm = d_all[idx[n1:n1+n2]]
         return compute_skl(d1_perm, d2_perm, k)
     
+    def plot_skl_distribution(null_distribution, obs_kl, p_value, results_manager):
+        fig, ax = plt.subplots(figsize=(10, 6))
+        ax.hist(null_distribution, bins=30, alpha=0.7, label='Null Distribution')
+        ax.axvline(obs_kl, color='r', linestyle='--', label=f'Observed KL = {obs_kl:.4f}')
+        ax.set_xlabel('Symmetric KL Divergence')
+        ax.set_ylabel('Frequency')
+        ax.set_title(f'Bivariate Equivalence Test (p-value = {p_value:.4f})')
+        ax.legend()
+        fig.tight_layout()
+        results_manager.save_plot(fig, "skl_distribution.png", test_name="bivariate_test")
+
+    def plot_scatter(d1, d2, results_manager):
+        fig, ax = plt.subplots(figsize=(8, 8))
+        ax.scatter(d1[:, 0], d1[:, 1], color='red', label='Edge Pair Class 1', alpha=0.6)
+        ax.scatter(d2[:, 0], d2[:, 1], color='purple', label='Edge Pair Class 2', alpha=0.6)
+        ax.set_xlabel('Flow 1')
+        ax.set_ylabel('Flow 2')
+        ax.set_title('Bivariate Data Scatter Plot')
+        ax.legend()
+        ax.grid(True)
+        ax.set_aspect('equal', adjustable='box')
+        fig.tight_layout()
+        results_manager.save_plot(fig, "scatter_plot.png", test_name="bivariate_test")
+    
+    def plot_2d_density_comparison(d1, d2, k, config, results_manager):
+        GRID_SIZE = config.BIVARIATE_GRID_SIZE
+        EXTEND_RATIO = config.BIVARIATE_EXTEND_RATIO
+        EPSILON = config.EPSILON
+
+        all_points = np.concatenate([d1, d2])
+        global_min = all_points.min()
+        global_max = all_points.max()
+        margin = (global_max - global_min) * EXTEND_RATIO
+
+        axis_min = global_min - margin
+        axis_max = global_max + margin
+        
+        x_grid = np.linspace(axis_min, axis_max, GRID_SIZE)
+        y_grid = np.linspace(axis_min, axis_max, GRID_SIZE)
+        XX, YY = np.meshgrid(x_grid, y_grid)
+        grid_points = np.c_[XX.ravel(), YY.ravel()]
+
+        P = knn_density(grid_points, d1, k).reshape(XX.shape)
+        Q = knn_density(grid_points, d2, k).reshape(XX.shape)
+
+        vmax_density = max(np.max(P), np.max(Q))
+
+        fig, axes = plt.subplots(1, 3, figsize=(24, 7))
+
+        for ax in axes:
+            ax.set_xlabel('Flow 1')
+            ax.set_aspect('equal', adjustable='box')
+            ax.set_xlim(axis_min, axis_max)
+            ax.set_ylim(axis_min, axis_max)
+            ax.grid(True)
+        axes[0].set_ylabel('Flow 2')
+
+        cp1 = axes[0].contourf(XX, YY, P, levels=20, cmap='viridis', vmin=0, vmax=vmax_density)
+        fig.colorbar(cp1, ax=axes[0])
+        axes[0].set_title('Density of Class 1 (P)')
+
+        cp2 = axes[1].contourf(XX, YY, Q, levels=20, cmap='viridis', vmin=0, vmax=vmax_density)
+        fig.colorbar(cp2, ax=axes[1])
+        axes[1].set_title('Density of Class 2 (Q)')
+
+        log_ratio = np.log(P + EPSILON) - np.log(Q + EPSILON)
+        max_abs = np.max(np.abs(log_ratio))
+        cp3 = axes[2].contourf(XX, YY, log_ratio, levels=20, cmap='coolwarm', vmin=-max_abs, vmax=max_abs)
+        fig.colorbar(cp3, ax=axes[2])
+        axes[2].set_title('Log Ratio: log(P / Q)')
+
+        fig.tight_layout()
+        
+        results_manager.save_plot(fig, "density_comparison.png", test_name="bivariate_test")
+    
     
     # --- 3. Finding the optimal K value through cross-validation---
     print("Finding optimal K using cross-validation on combined data...")
@@ -143,51 +217,34 @@ def run_bivariate_test(D1_df, D2_df, D_all_df, config, results_manager):
         for s in tqdm(seeds, desc="KL Under Null (Parallel)")
     )
     
+    # --- 6. P-value computation ---
     p_value = (np.sum(np.array(null_distribution) >= obs_kl) + 1) / (N_PERMUTATIONS + 1)
-
-    # --- 6. # Plot ---
-    # a. Null Distribution
-    fig1, ax1 = plt.subplots(figsize=(10, 6))
-    ax1.hist(null_distribution, bins=30, alpha=0.7, label='Null Distribution')
-    ax1.axvline(obs_kl, color='r', linestyle='--', label=f'Observed KL = {obs_kl:.4f}')
-    ax1.set_xlabel('Symmetric KL Divergence')
-    ax1.set_ylabel('Frequency')
-    ax1.set_title(f'Bivariate Equivalence Test (p-value = {p_value:.4f})')
-    ax1.legend()
-    fig1.tight_layout()
-
-
-    # b. Scatter Plot
-    fig2, ax2 = plt.subplots(figsize=(8, 8))
-    ax2.scatter(D1[:, 0], D1[:, 1], color='red', label='Edge Pair Class 1', alpha=0.6)
-    ax2.scatter(D2[:, 0], D2[:, 1], color='purple', label='Edge Pair Class 2', alpha=0.6)
-    ax2.set_xlabel('Flow 1')
-    ax2.set_ylabel('Flow 2')
-    ax2.set_title('Bivariate Data Scatter Plot')
-    ax2.legend()
-    ax2.grid(True)
-    ax2.set_aspect('equal', adjustable='box')
-    fig2.tight_layout()
- 
     
+    plot_2d_density_comparison(D1, D2, K_optimal, config, results_manager)
+
+    # --- 7. Generate and save all visualizations ---  
+    plot_skl_distribution(null_distribution, obs_kl, p_value, results_manager)
+    plot_scatter(D1, D2, results_manager)
+    plot_2d_density_comparison(D1, D2, K_optimal, config, results_manager)
+        
     #save result
     test_results = {
         'observed_skl': float(obs_kl),
         'p_value': float(p_value),
         'optimal_k': int(K_optimal),
         'k_candidates': [int(k) for k in k_candidates],
+        '#class1': int(n_BED1),
+        '#class2': int(n_BED2)
     }
     results_manager.save_json(test_results, "result.json", test_name="bivariate_test")
-    results_manager.add_to_report("Bivariate Equivalence Test", p_value, params=f"K={K_optimal}, #class1={n_BED1}, #class2={n_BED2}")
-    results_manager.save_plot(fig1, "skl_distribution.png", test_name="bivariate_test")
-    results_manager.save_plot(fig2, "scatter_plot.png", test_name="bivariate_test")
+    results_manager.add_to_report("Bivariate Equivalence Test", p_value, alpha/3, params=f"K={K_optimal}, #class1={n_BED1}, #class2={n_BED2}")
     
     print(f"\nBivariate Test Result:")
     print(f"Observed Symmetric KL Divergence: {obs_kl:.4f}")
     print(f"P value: {p_value:.4f}")
-    if p_value < alpha:
-        print(f"Conclusion: Reject the null hypothesis (p < {alpha}). The distributions are significantly different.")
+    if p_value < alpha/3:
+        print(f"Conclusion: Reject the null hypothesis (p < {alpha/3}). The distributions are significantly different.")
     else:
-        print(f"Conclusion: Fail to reject the null hypothesis (p >= {alpha}). There is no significant evidence that the distributions are different.")
+        print(f"Conclusion: Fail to reject the null hypothesis (p >= {alpha/3}). There is no significant evidence that the distributions are different.")
         
     return test_results
