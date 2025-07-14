@@ -1,0 +1,251 @@
+Dataset ID,Test Name,Parameters,P-Value,Alpha,Conclusion
+SmallWorld-Beta0.7_K13-Rho0.5_D3_W0.5_Neg-4kNodes_Sample1,KS Test,,0.0872673739645268,0.0166666666666666,Fail to Reject H0
+SmallWorld-Beta0.7_K13-Rho0.5_D3_W0.5_Neg-4kNodes_Sample1,Independence Test (Color: 0),"K_marg=8, K_joint=8, n_samples=1796",0.997002997002997,0.0055555555555555,Fail to Reject H0
+SmallWorld-Beta0.7_K13-Rho0.5_D3_W0.5_Neg-4kNodes_Sample1,Independence Test (Color: 1),"K_marg=8, K_joint=8, n_samples=1794",0.8891108891108891,0.0055555555555555,Fail to Reject H0
+SmallWorld-Beta0.7_K13-Rho0.5_D3_W0.5_Neg-4kNodes_Sample1,Independence Test (Color: 2),"K_marg=8, K_joint=8, n_samples=1792",0.6623376623376623,0.0055555555555555,Fail to Reject H0
+SmallWorld-Beta0.7_K13-Rho0.5_D3_W0.5_Neg-4kNodes_Sample1,Bivariate Equivalence Test,"K=34, #class1=511, #class2=665",0.0819180819180819,0.0166666666666666,Fail to Reject H0
+SmallWorld-Beta0.7_K13-Rho0.5_D3_W0.5_Neg-4kNodes_Sample2,KS Test,,0.0632297370834363,0.0166666666666666,Fail to Reject H0
+SmallWorld-Beta0.7_K13-Rho0.5_D3_W0.5_Neg-4kNodes_Sample2,Independence Test (Color: 0),"K_marg=8, K_joint=8, n_samples=1796",0.0109890109890109,0.0055555555555555,Fail to Reject H0
+SmallWorld-Beta0.7_K13-Rho0.5_D3_W0.5_Neg-4kNodes_Sample2,Independence Test (Color: 1),"K_marg=8, K_joint=8, n_samples=1794",0.0759240759240759,0.0055555555555555,Fail to Reject H0
+SmallWorld-Beta0.7_K13-Rho0.5_D3_W0.5_Neg-4kNodes_Sample2,Independence Test (Color: 2),"K_marg=8, K_joint=8, n_samples=1792",0.0009990009990009,0.0055555555555555,Reject H0
+SmallWorld-Beta0.7_K13-Rho0.5_D3_W0.5_Neg-4kNodes_Sample2,Bivariate Equivalence Test,"K=29, #class1=511, #class2=665",0.0109890109890109,0.0166666666666666,Reject H0
+SmallWorld-Beta0.7_K13-Rho0.5_D3_W0.5_Neg-4kNodes_Sample3,KS Test,,0.0558623239902189,0.0166666666666666,Fail to Reject H0
+SmallWorld-Beta0.7_K13-Rho0.5_D3_W0.5_Neg-4kNodes_Sample3,Independence Test (Color: 0),"K_marg=8, K_joint=8, n_samples=1796",0.7482517482517482,0.0055555555555555,Fail to Reject H0
+SmallWorld-Beta0.7_K13-Rho0.5_D3_W0.5_Neg-4kNodes_Sample3,Independence Test (Color: 1),"K_marg=8, K_joint=8, n_samples=1794",0.93006993006993,0.0055555555555555,Fail to Reject H0
+SmallWorld-Beta0.7_K13-Rho0.5_D3_W0.5_Neg-4kNodes_Sample3,Independence Test (Color: 2),"K_marg=8, K_joint=8, n_samples=1792",0.991008991008991,0.0055555555555555,Fail to Reject H0
+SmallWorld-Beta0.7_K13-Rho0.5_D3_W0.5_Neg-4kNodes_Sample3,Bivariate Equivalence Test,"K=8, #class1=511, #class2=665",0.0479520479520479,0.0166666666666666,Fail to Reject H0
+SmallWorld-Beta0.7_K13-Rho0.5_D3_W0.5_Neg-4kNodes_Sample4,KS Test,,0.1311164406443697,0.0166666666666666,Fail to Reject H0
+SmallWorld-Beta0.7_K13-Rho0.5_D3_W0.5_Neg-4kNodes_Sample4,Independence Test (Color: 0),"K_marg=8, K_joint=8, n_samples=1796",0.9270729270729272,0.0055555555555555,Fail to Reject H0
+SmallWorld-Beta0.7_K13-Rho0.5_D3_W0.5_Neg-4kNodes_Sample4,Independence Test (Color: 1),"K_marg=8, K_joint=8, n_samples=1794",0.951048951048951,0.0055555555555555,Fail to Reject H0
+SmallWorld-Beta0.7_K13-Rho0.5_D3_W0.5_Neg-4kNodes_Sample4,Independence Test (Color: 2),"K_marg=8, K_joint=8, n_samples=1792",0.993006993006993,0.0055555555555555,Fail to Reject H0
+SmallWorld-Beta0.7_K13-Rho0.5_D3_W0.5_Neg-4kNodes_Sample4,Bivariate Equivalence Test,"K=8, #class1=511, #class2=665",0.0699300699300699,0.0166666666666666,Fail to Reject H0
+SmallWorld-Beta0.7_K13-Rho0.5_D3_W0.5_Neg-4kNodes_Sample5,KS Test,,0.007176477898517,0.0166666666666666,Reject H0
+SmallWorld-Beta0.7_K13-Rho0.5_D3_W0.5_Neg-4kNodes_Sample5,Independence Test (Color: 0),"K_marg=8, K_joint=8, n_samples=1796",0.3036963036963037,0.0055555555555555,Fail to Reject H0
+SmallWorld-Beta0.7_K13-Rho0.5_D3_W0.5_Neg-4kNodes_Sample5,Independence Test (Color: 1),"K_marg=8, K_joint=8, n_samples=1794",0.0609390609390609,0.0055555555555555,Fail to Reject H0
+SmallWorld-Beta0.7_K13-Rho0.5_D3_W0.5_Neg-4kNodes_Sample5,Independence Test (Color: 2),"K_marg=8, K_joint=8, n_samples=1792",0.985014985014985,0.0055555555555555,Fail to Reject H0
+SmallWorld-Beta0.7_K13-Rho0.5_D3_W0.5_Neg-4kNodes_Sample5,Bivariate Equivalence Test,"K=8, #class1=511, #class2=665",0.0729270729270729,0.0166666666666666,Fail to Reject H0
+SmallWorld-Beta0.7_K13-Rho0.5_D3_W0.5_Neg-4kNodes_Sample6,KS Test,,0.0129164959853955,0.0166666666666666,Reject H0
+SmallWorld-Beta0.7_K13-Rho0.5_D3_W0.5_Neg-4kNodes_Sample6,Independence Test (Color: 0),"K_marg=8, K_joint=8, n_samples=1796",0.7832167832167832,0.0055555555555555,Fail to Reject H0
+SmallWorld-Beta0.7_K13-Rho0.5_D3_W0.5_Neg-4kNodes_Sample6,Independence Test (Color: 1),"K_marg=8, K_joint=8, n_samples=1794",1.0,0.0055555555555555,Fail to Reject H0
+SmallWorld-Beta0.7_K13-Rho0.5_D3_W0.5_Neg-4kNodes_Sample6,Independence Test (Color: 2),"K_marg=8, K_joint=8, n_samples=1792",0.7082917082917083,0.0055555555555555,Fail to Reject H0
+SmallWorld-Beta0.7_K13-Rho0.5_D3_W0.5_Neg-4kNodes_Sample6,Bivariate Equivalence Test,"K=32, #class1=511, #class2=665",0.2267732267732267,0.0166666666666666,Fail to Reject H0
+SmallWorld-Beta0.7_K13-Rho0.5_D3_W0.5_Neg-4kNodes_Sample7,KS Test,,0.0642546693997648,0.0166666666666666,Fail to Reject H0
+SmallWorld-Beta0.7_K13-Rho0.5_D3_W0.5_Neg-4kNodes_Sample7,Independence Test (Color: 0),"K_marg=8, K_joint=8, n_samples=1796",0.992007992007992,0.0055555555555555,Fail to Reject H0
+SmallWorld-Beta0.7_K13-Rho0.5_D3_W0.5_Neg-4kNodes_Sample7,Independence Test (Color: 1),"K_marg=8, K_joint=8, n_samples=1794",0.5834165834165834,0.0055555555555555,Fail to Reject H0
+SmallWorld-Beta0.7_K13-Rho0.5_D3_W0.5_Neg-4kNodes_Sample7,Independence Test (Color: 2),"K_marg=8, K_joint=8, n_samples=1792",0.997002997002997,0.0055555555555555,Fail to Reject H0
+SmallWorld-Beta0.7_K13-Rho0.5_D3_W0.5_Neg-4kNodes_Sample7,Bivariate Equivalence Test,"K=8, #class1=511, #class2=665",0.0009990009990009,0.0166666666666666,Reject H0
+SmallWorld-Beta0.7_K13-Rho0.5_D3_W0.5_Neg-4kNodes_Sample8,KS Test,,0.4282279218929283,0.0166666666666666,Fail to Reject H0
+SmallWorld-Beta0.7_K13-Rho0.5_D3_W0.5_Neg-4kNodes_Sample8,Independence Test (Color: 0),"K_marg=8, K_joint=8, n_samples=1796",0.9250749250749252,0.0055555555555555,Fail to Reject H0
+SmallWorld-Beta0.7_K13-Rho0.5_D3_W0.5_Neg-4kNodes_Sample8,Independence Test (Color: 1),"K_marg=8, K_joint=8, n_samples=1794",0.8211788211788211,0.0055555555555555,Fail to Reject H0
+SmallWorld-Beta0.7_K13-Rho0.5_D3_W0.5_Neg-4kNodes_Sample8,Independence Test (Color: 2),"K_marg=8, K_joint=8, n_samples=1792",1.0,0.0055555555555555,Fail to Reject H0
+SmallWorld-Beta0.7_K13-Rho0.5_D3_W0.5_Neg-4kNodes_Sample8,Bivariate Equivalence Test,"K=8, #class1=511, #class2=665",0.2047952047952048,0.0166666666666666,Fail to Reject H0
+SmallWorld-Beta0.7_K13-Rho0.5_D3_W0.5_Neg-4kNodes_Sample9,KS Test,,0.0219820144806666,0.0166666666666666,Fail to Reject H0
+SmallWorld-Beta0.7_K13-Rho0.5_D3_W0.5_Neg-4kNodes_Sample9,Independence Test (Color: 0),"K_marg=8, K_joint=8, n_samples=1796",0.9050949050949052,0.0055555555555555,Fail to Reject H0
+SmallWorld-Beta0.7_K13-Rho0.5_D3_W0.5_Neg-4kNodes_Sample9,Independence Test (Color: 1),"K_marg=8, K_joint=8, n_samples=1794",0.2227772227772227,0.0055555555555555,Fail to Reject H0
+SmallWorld-Beta0.7_K13-Rho0.5_D3_W0.5_Neg-4kNodes_Sample9,Independence Test (Color: 2),"K_marg=8, K_joint=8, n_samples=1792",0.976023976023976,0.0055555555555555,Fail to Reject H0
+SmallWorld-Beta0.7_K13-Rho0.5_D3_W0.5_Neg-4kNodes_Sample9,Bivariate Equivalence Test,"K=8, #class1=511, #class2=665",0.0469530469530469,0.0166666666666666,Fail to Reject H0
+SmallWorld-Beta0.7_K13-Rho0.5_D3_W0.5_Neg-4kNodes_Sample10,KS Test,,0.4080831814256713,0.0166666666666666,Fail to Reject H0
+SmallWorld-Beta0.7_K13-Rho0.5_D3_W0.5_Neg-4kNodes_Sample10,Independence Test (Color: 0),"K_marg=8, K_joint=8, n_samples=1796",0.4115884115884116,0.0055555555555555,Fail to Reject H0
+SmallWorld-Beta0.7_K13-Rho0.5_D3_W0.5_Neg-4kNodes_Sample10,Independence Test (Color: 1),"K_marg=8, K_joint=8, n_samples=1794",0.3616383616383616,0.0055555555555555,Fail to Reject H0
+SmallWorld-Beta0.7_K13-Rho0.5_D3_W0.5_Neg-4kNodes_Sample10,Independence Test (Color: 2),"K_marg=8, K_joint=8, n_samples=1792",0.0999000999000999,0.0055555555555555,Fail to Reject H0
+SmallWorld-Beta0.7_K13-Rho0.5_D3_W0.5_Neg-4kNodes_Sample10,Bivariate Equivalence Test,"K=8, #class1=511, #class2=665",0.4715284715284715,0.0166666666666666,Fail to Reject H0
+SmallWorld-Beta0.7_K13-Rho0.5_D3_W0.5_Neg-4kNodes_Sample11,KS Test,,0.0088514182955843,0.0166666666666666,Reject H0
+SmallWorld-Beta0.7_K13-Rho0.5_D3_W0.5_Neg-4kNodes_Sample11,Independence Test (Color: 0),"K_marg=8, K_joint=8, n_samples=1796",0.997002997002997,0.0055555555555555,Fail to Reject H0
+SmallWorld-Beta0.7_K13-Rho0.5_D3_W0.5_Neg-4kNodes_Sample11,Independence Test (Color: 1),"K_marg=8, K_joint=8, n_samples=1794",0.5444555444555444,0.0055555555555555,Fail to Reject H0
+SmallWorld-Beta0.7_K13-Rho0.5_D3_W0.5_Neg-4kNodes_Sample11,Independence Test (Color: 2),"K_marg=8, K_joint=8, n_samples=1792",0.994005994005994,0.0055555555555555,Fail to Reject H0
+SmallWorld-Beta0.7_K13-Rho0.5_D3_W0.5_Neg-4kNodes_Sample11,Bivariate Equivalence Test,"K=11, #class1=511, #class2=665",0.5664335664335665,0.0166666666666666,Fail to Reject H0
+SmallWorld-Beta0.7_K13-Rho0.5_D3_W0.5_Neg-4kNodes_Sample12,KS Test,,0.8018277256286106,0.0166666666666666,Fail to Reject H0
+SmallWorld-Beta0.7_K13-Rho0.5_D3_W0.5_Neg-4kNodes_Sample12,Independence Test (Color: 0),"K_marg=8, K_joint=8, n_samples=1796",0.97002997002997,0.0055555555555555,Fail to Reject H0
+SmallWorld-Beta0.7_K13-Rho0.5_D3_W0.5_Neg-4kNodes_Sample12,Independence Test (Color: 1),"K_marg=8, K_joint=8, n_samples=1794",0.4845154845154845,0.0055555555555555,Fail to Reject H0
+SmallWorld-Beta0.7_K13-Rho0.5_D3_W0.5_Neg-4kNodes_Sample12,Independence Test (Color: 2),"K_marg=8, K_joint=8, n_samples=1792",0.8071928071928072,0.0055555555555555,Fail to Reject H0
+SmallWorld-Beta0.7_K13-Rho0.5_D3_W0.5_Neg-4kNodes_Sample12,Bivariate Equivalence Test,"K=8, #class1=511, #class2=665",0.3656343656343656,0.0166666666666666,Fail to Reject H0
+SmallWorld-Beta0.7_K13-Rho0.5_D3_W0.5_Neg-4kNodes_Sample13,KS Test,,0.4875296660736851,0.0166666666666666,Fail to Reject H0
+SmallWorld-Beta0.7_K13-Rho0.5_D3_W0.5_Neg-4kNodes_Sample13,Independence Test (Color: 0),"K_marg=8, K_joint=8, n_samples=1796",0.0809190809190809,0.0055555555555555,Fail to Reject H0
+SmallWorld-Beta0.7_K13-Rho0.5_D3_W0.5_Neg-4kNodes_Sample13,Independence Test (Color: 1),"K_marg=8, K_joint=8, n_samples=1794",0.3896103896103896,0.0055555555555555,Fail to Reject H0
+SmallWorld-Beta0.7_K13-Rho0.5_D3_W0.5_Neg-4kNodes_Sample13,Independence Test (Color: 2),"K_marg=8, K_joint=8, n_samples=1792",0.962037962037962,0.0055555555555555,Fail to Reject H0
+SmallWorld-Beta0.7_K13-Rho0.5_D3_W0.5_Neg-4kNodes_Sample13,Bivariate Equivalence Test,"K=8, #class1=511, #class2=665",0.0169830169830169,0.0166666666666666,Fail to Reject H0
+SmallWorld-Beta0.7_K13-Rho0.5_D3_W0.5_Neg-4kNodes_Sample14,KS Test,,0.2033356788257714,0.0166666666666666,Fail to Reject H0
+SmallWorld-Beta0.7_K13-Rho0.5_D3_W0.5_Neg-4kNodes_Sample14,Independence Test (Color: 0),"K_marg=8, K_joint=8, n_samples=1796",0.903096903096903,0.0055555555555555,Fail to Reject H0
+SmallWorld-Beta0.7_K13-Rho0.5_D3_W0.5_Neg-4kNodes_Sample14,Independence Test (Color: 1),"K_marg=8, K_joint=8, n_samples=1794",0.9170829170829172,0.0055555555555555,Fail to Reject H0
+SmallWorld-Beta0.7_K13-Rho0.5_D3_W0.5_Neg-4kNodes_Sample14,Independence Test (Color: 2),"K_marg=8, K_joint=8, n_samples=1792",0.908091908091908,0.0055555555555555,Fail to Reject H0
+SmallWorld-Beta0.7_K13-Rho0.5_D3_W0.5_Neg-4kNodes_Sample14,Bivariate Equivalence Test,"K=8, #class1=511, #class2=665",0.1158841158841158,0.0166666666666666,Fail to Reject H0
+SmallWorld-Beta0.7_K13-Rho0.5_D3_W0.5_Neg-4kNodes_Sample15,KS Test,,0.1046795252657185,0.0166666666666666,Fail to Reject H0
+SmallWorld-Beta0.7_K13-Rho0.5_D3_W0.5_Neg-4kNodes_Sample15,Independence Test (Color: 0),"K_marg=8, K_joint=8, n_samples=1796",0.967032967032967,0.0055555555555555,Fail to Reject H0
+SmallWorld-Beta0.7_K13-Rho0.5_D3_W0.5_Neg-4kNodes_Sample15,Independence Test (Color: 1),"K_marg=8, K_joint=8, n_samples=1794",0.3796203796203796,0.0055555555555555,Fail to Reject H0
+SmallWorld-Beta0.7_K13-Rho0.5_D3_W0.5_Neg-4kNodes_Sample15,Independence Test (Color: 2),"K_marg=8, K_joint=8, n_samples=1792",0.7292707292707292,0.0055555555555555,Fail to Reject H0
+SmallWorld-Beta0.7_K13-Rho0.5_D3_W0.5_Neg-4kNodes_Sample15,Bivariate Equivalence Test,"K=8, #class1=511, #class2=665",0.3186813186813186,0.0166666666666666,Fail to Reject H0
+SmallWorld-Beta0.7_K13-Rho0.5_D3_W0.5_Neg-4kNodes_Sample16,KS Test,,0.0661491356881321,0.0166666666666666,Fail to Reject H0
+SmallWorld-Beta0.7_K13-Rho0.5_D3_W0.5_Neg-4kNodes_Sample16,Independence Test (Color: 0),"K_marg=8, K_joint=8, n_samples=1796",0.7932067932067932,0.0055555555555555,Fail to Reject H0
+SmallWorld-Beta0.7_K13-Rho0.5_D3_W0.5_Neg-4kNodes_Sample16,Independence Test (Color: 1),"K_marg=8, K_joint=8, n_samples=1794",0.2857142857142857,0.0055555555555555,Fail to Reject H0
+SmallWorld-Beta0.7_K13-Rho0.5_D3_W0.5_Neg-4kNodes_Sample16,Independence Test (Color: 2),"K_marg=8, K_joint=8, n_samples=1792",0.8841158841158842,0.0055555555555555,Fail to Reject H0
+SmallWorld-Beta0.7_K13-Rho0.5_D3_W0.5_Neg-4kNodes_Sample16,Bivariate Equivalence Test,"K=8, #class1=511, #class2=665",0.3746253746253746,0.0166666666666666,Fail to Reject H0
+SmallWorld-Beta0.7_K13-Rho0.5_D3_W0.5_Neg-4kNodes_Sample17,KS Test,,0.6813726822758444,0.0166666666666666,Fail to Reject H0
+SmallWorld-Beta0.7_K13-Rho0.5_D3_W0.5_Neg-4kNodes_Sample17,Independence Test (Color: 0),"K_marg=8, K_joint=8, n_samples=1796",0.3026973026973027,0.0055555555555555,Fail to Reject H0
+SmallWorld-Beta0.7_K13-Rho0.5_D3_W0.5_Neg-4kNodes_Sample17,Independence Test (Color: 1),"K_marg=8, K_joint=8, n_samples=1794",0.4925074925074925,0.0055555555555555,Fail to Reject H0
+SmallWorld-Beta0.7_K13-Rho0.5_D3_W0.5_Neg-4kNodes_Sample17,Independence Test (Color: 2),"K_marg=8, K_joint=8, n_samples=1792",0.8961038961038961,0.0055555555555555,Fail to Reject H0
+SmallWorld-Beta0.7_K13-Rho0.5_D3_W0.5_Neg-4kNodes_Sample17,Bivariate Equivalence Test,"K=8, #class1=511, #class2=665",0.0059940059940059,0.0166666666666666,Reject H0
+SmallWorld-Beta0.7_K13-Rho0.5_D3_W0.5_Neg-4kNodes_Sample18,KS Test,,0.255366268257999,0.0166666666666666,Fail to Reject H0
+SmallWorld-Beta0.7_K13-Rho0.5_D3_W0.5_Neg-4kNodes_Sample18,Independence Test (Color: 0),"K_marg=8, K_joint=8, n_samples=1796",0.1608391608391608,0.0055555555555555,Fail to Reject H0
+SmallWorld-Beta0.7_K13-Rho0.5_D3_W0.5_Neg-4kNodes_Sample18,Independence Test (Color: 1),"K_marg=8, K_joint=8, n_samples=1794",0.0309690309690309,0.0055555555555555,Fail to Reject H0
+SmallWorld-Beta0.7_K13-Rho0.5_D3_W0.5_Neg-4kNodes_Sample18,Independence Test (Color: 2),"K_marg=8, K_joint=8, n_samples=1792",0.2807192807192807,0.0055555555555555,Fail to Reject H0
+SmallWorld-Beta0.7_K13-Rho0.5_D3_W0.5_Neg-4kNodes_Sample18,Bivariate Equivalence Test,"K=8, #class1=511, #class2=665",0.0449550449550449,0.0166666666666666,Fail to Reject H0
+SmallWorld-Beta0.7_K13-Rho0.5_D3_W0.5_Neg-4kNodes_Sample19,KS Test,,0.2769230571289435,0.0166666666666666,Fail to Reject H0
+SmallWorld-Beta0.7_K13-Rho0.5_D3_W0.5_Neg-4kNodes_Sample19,Independence Test (Color: 0),"K_marg=8, K_joint=8, n_samples=1796",0.0519480519480519,0.0055555555555555,Fail to Reject H0
+SmallWorld-Beta0.7_K13-Rho0.5_D3_W0.5_Neg-4kNodes_Sample19,Independence Test (Color: 1),"K_marg=8, K_joint=8, n_samples=1794",0.8991008991008991,0.0055555555555555,Fail to Reject H0
+SmallWorld-Beta0.7_K13-Rho0.5_D3_W0.5_Neg-4kNodes_Sample19,Independence Test (Color: 2),"K_marg=8, K_joint=8, n_samples=1792",0.6243756243756243,0.0055555555555555,Fail to Reject H0
+SmallWorld-Beta0.7_K13-Rho0.5_D3_W0.5_Neg-4kNodes_Sample19,Bivariate Equivalence Test,"K=8, #class1=511, #class2=665",0.0049950049950049,0.0166666666666666,Reject H0
+SmallWorld-Beta0.7_K13-Rho0.5_D3_W0.5_Neg-4kNodes_Sample20,KS Test,,0.1792287457799763,0.0166666666666666,Fail to Reject H0
+SmallWorld-Beta0.7_K13-Rho0.5_D3_W0.5_Neg-4kNodes_Sample20,Independence Test (Color: 0),"K_marg=8, K_joint=8, n_samples=1796",0.1738261738261738,0.0055555555555555,Fail to Reject H0
+SmallWorld-Beta0.7_K13-Rho0.5_D3_W0.5_Neg-4kNodes_Sample20,Independence Test (Color: 1),"K_marg=8, K_joint=8, n_samples=1794",0.0019980019980019,0.0055555555555555,Reject H0
+SmallWorld-Beta0.7_K13-Rho0.5_D3_W0.5_Neg-4kNodes_Sample20,Independence Test (Color: 2),"K_marg=8, K_joint=8, n_samples=1792",0.8711288711288712,0.0055555555555555,Fail to Reject H0
+SmallWorld-Beta0.7_K13-Rho0.5_D3_W0.5_Neg-4kNodes_Sample20,Bivariate Equivalence Test,"K=8, #class1=511, #class2=665",0.1318681318681318,0.0166666666666666,Fail to Reject H0
+SmallWorld-Beta0.7_K13-Rho0.5_D3_W0.5_Neg-4kNodes_Sample21,KS Test,,0.1024711584747173,0.0166666666666666,Fail to Reject H0
+SmallWorld-Beta0.7_K13-Rho0.5_D3_W0.5_Neg-4kNodes_Sample21,Independence Test (Color: 0),"K_marg=8, K_joint=8, n_samples=1796",0.4655344655344655,0.0055555555555555,Fail to Reject H0
+SmallWorld-Beta0.7_K13-Rho0.5_D3_W0.5_Neg-4kNodes_Sample21,Independence Test (Color: 1),"K_marg=8, K_joint=8, n_samples=1794",0.5404595404595405,0.0055555555555555,Fail to Reject H0
+SmallWorld-Beta0.7_K13-Rho0.5_D3_W0.5_Neg-4kNodes_Sample21,Independence Test (Color: 2),"K_marg=8, K_joint=8, n_samples=1792",0.997002997002997,0.0055555555555555,Fail to Reject H0
+SmallWorld-Beta0.7_K13-Rho0.5_D3_W0.5_Neg-4kNodes_Sample21,Bivariate Equivalence Test,"K=8, #class1=511, #class2=665",0.2947052947052947,0.0166666666666666,Fail to Reject H0
+SmallWorld-Beta0.7_K13-Rho0.5_D3_W0.5_Neg-4kNodes_Sample22,KS Test,,0.0019790001974191,0.0166666666666666,Reject H0
+SmallWorld-Beta0.7_K13-Rho0.5_D3_W0.5_Neg-4kNodes_Sample22,Independence Test (Color: 0),"K_marg=8, K_joint=8, n_samples=1796",0.0149850149850149,0.0055555555555555,Fail to Reject H0
+SmallWorld-Beta0.7_K13-Rho0.5_D3_W0.5_Neg-4kNodes_Sample22,Independence Test (Color: 1),"K_marg=8, K_joint=8, n_samples=1794",0.0189810189810189,0.0055555555555555,Fail to Reject H0
+SmallWorld-Beta0.7_K13-Rho0.5_D3_W0.5_Neg-4kNodes_Sample22,Independence Test (Color: 2),"K_marg=8, K_joint=8, n_samples=1792",0.0009990009990009,0.0055555555555555,Reject H0
+SmallWorld-Beta0.7_K13-Rho0.5_D3_W0.5_Neg-4kNodes_Sample22,Bivariate Equivalence Test,"K=8, #class1=511, #class2=665",0.0009990009990009,0.0166666666666666,Reject H0
+SmallWorld-Beta0.7_K13-Rho0.5_D3_W0.5_Neg-4kNodes_Sample23,KS Test,,0.8460451202352648,0.0166666666666666,Fail to Reject H0
+SmallWorld-Beta0.7_K13-Rho0.5_D3_W0.5_Neg-4kNodes_Sample23,Independence Test (Color: 0),"K_marg=8, K_joint=8, n_samples=1796",0.3786213786213786,0.0055555555555555,Fail to Reject H0
+SmallWorld-Beta0.7_K13-Rho0.5_D3_W0.5_Neg-4kNodes_Sample23,Independence Test (Color: 1),"K_marg=8, K_joint=8, n_samples=1794",0.3866133866133866,0.0055555555555555,Fail to Reject H0
+SmallWorld-Beta0.7_K13-Rho0.5_D3_W0.5_Neg-4kNodes_Sample23,Independence Test (Color: 2),"K_marg=8, K_joint=8, n_samples=1792",0.8031968031968032,0.0055555555555555,Fail to Reject H0
+SmallWorld-Beta0.7_K13-Rho0.5_D3_W0.5_Neg-4kNodes_Sample23,Bivariate Equivalence Test,"K=20, #class1=511, #class2=665",0.0039960039960039,0.0166666666666666,Reject H0
+SmallWorld-Beta0.7_K13-Rho0.5_D3_W0.5_Neg-4kNodes_Sample24,KS Test,,0.4479055751945264,0.0166666666666666,Fail to Reject H0
+SmallWorld-Beta0.7_K13-Rho0.5_D3_W0.5_Neg-4kNodes_Sample24,Independence Test (Color: 0),"K_marg=8, K_joint=8, n_samples=1796",0.7152847152847153,0.0055555555555555,Fail to Reject H0
+SmallWorld-Beta0.7_K13-Rho0.5_D3_W0.5_Neg-4kNodes_Sample24,Independence Test (Color: 1),"K_marg=8, K_joint=8, n_samples=1794",0.2257742257742257,0.0055555555555555,Fail to Reject H0
+SmallWorld-Beta0.7_K13-Rho0.5_D3_W0.5_Neg-4kNodes_Sample24,Independence Test (Color: 2),"K_marg=8, K_joint=8, n_samples=1792",0.5174825174825175,0.0055555555555555,Fail to Reject H0
+SmallWorld-Beta0.7_K13-Rho0.5_D3_W0.5_Neg-4kNodes_Sample24,Bivariate Equivalence Test,"K=8, #class1=511, #class2=665",0.3176823176823177,0.0166666666666666,Fail to Reject H0
+SmallWorld-Beta0.7_K13-Rho0.5_D3_W0.5_Neg-4kNodes_Sample25,KS Test,,0.0656626620536092,0.0166666666666666,Fail to Reject H0
+SmallWorld-Beta0.7_K13-Rho0.5_D3_W0.5_Neg-4kNodes_Sample25,Independence Test (Color: 0),"K_marg=8, K_joint=8, n_samples=1796",0.962037962037962,0.0055555555555555,Fail to Reject H0
+SmallWorld-Beta0.7_K13-Rho0.5_D3_W0.5_Neg-4kNodes_Sample25,Independence Test (Color: 1),"K_marg=8, K_joint=8, n_samples=1794",0.0479520479520479,0.0055555555555555,Fail to Reject H0
+SmallWorld-Beta0.7_K13-Rho0.5_D3_W0.5_Neg-4kNodes_Sample25,Independence Test (Color: 2),"K_marg=8, K_joint=8, n_samples=1792",0.7602397602397603,0.0055555555555555,Fail to Reject H0
+SmallWorld-Beta0.7_K13-Rho0.5_D3_W0.5_Neg-4kNodes_Sample25,Bivariate Equivalence Test,"K=8, #class1=511, #class2=665",0.0279720279720279,0.0166666666666666,Fail to Reject H0
+SmallWorld-Beta0.7_K13-Rho0.5_D3_W0.5_Neg-4kNodes_Sample26,KS Test,,0.0879352916738413,0.0166666666666666,Fail to Reject H0
+SmallWorld-Beta0.7_K13-Rho0.5_D3_W0.5_Neg-4kNodes_Sample26,Independence Test (Color: 0),"K_marg=8, K_joint=8, n_samples=1796",0.1438561438561438,0.0055555555555555,Fail to Reject H0
+SmallWorld-Beta0.7_K13-Rho0.5_D3_W0.5_Neg-4kNodes_Sample26,Independence Test (Color: 1),"K_marg=8, K_joint=8, n_samples=1794",0.7102897102897103,0.0055555555555555,Fail to Reject H0
+SmallWorld-Beta0.7_K13-Rho0.5_D3_W0.5_Neg-4kNodes_Sample26,Independence Test (Color: 2),"K_marg=8, K_joint=8, n_samples=1792",0.5504495504495505,0.0055555555555555,Fail to Reject H0
+SmallWorld-Beta0.7_K13-Rho0.5_D3_W0.5_Neg-4kNodes_Sample26,Bivariate Equivalence Test,"K=8, #class1=511, #class2=665",0.0009990009990009,0.0166666666666666,Reject H0
+SmallWorld-Beta0.7_K13-Rho0.5_D3_W0.5_Neg-4kNodes_Sample27,KS Test,,0.5510622918346917,0.0166666666666666,Fail to Reject H0
+SmallWorld-Beta0.7_K13-Rho0.5_D3_W0.5_Neg-4kNodes_Sample27,Independence Test (Color: 0),"K_marg=8, K_joint=8, n_samples=1796",0.2897102897102897,0.0055555555555555,Fail to Reject H0
+SmallWorld-Beta0.7_K13-Rho0.5_D3_W0.5_Neg-4kNodes_Sample27,Independence Test (Color: 1),"K_marg=8, K_joint=8, n_samples=1794",0.956043956043956,0.0055555555555555,Fail to Reject H0
+SmallWorld-Beta0.7_K13-Rho0.5_D3_W0.5_Neg-4kNodes_Sample27,Independence Test (Color: 2),"K_marg=8, K_joint=8, n_samples=1792",0.4125874125874126,0.0055555555555555,Fail to Reject H0
+SmallWorld-Beta0.7_K13-Rho0.5_D3_W0.5_Neg-4kNodes_Sample27,Bivariate Equivalence Test,"K=8, #class1=511, #class2=665",0.0029970029970029,0.0166666666666666,Reject H0
+SmallWorld-Beta0.7_K13-Rho0.5_D3_W0.5_Neg-4kNodes_Sample28,KS Test,,0.2340453040740708,0.0166666666666666,Fail to Reject H0
+SmallWorld-Beta0.7_K13-Rho0.5_D3_W0.5_Neg-4kNodes_Sample28,Independence Test (Color: 0),"K_marg=8, K_joint=8, n_samples=1796",0.8431568431568431,0.0055555555555555,Fail to Reject H0
+SmallWorld-Beta0.7_K13-Rho0.5_D3_W0.5_Neg-4kNodes_Sample28,Independence Test (Color: 1),"K_marg=8, K_joint=8, n_samples=1794",0.0329670329670329,0.0055555555555555,Fail to Reject H0
+SmallWorld-Beta0.7_K13-Rho0.5_D3_W0.5_Neg-4kNodes_Sample28,Independence Test (Color: 2),"K_marg=8, K_joint=8, n_samples=1792",0.0049950049950049,0.0055555555555555,Reject H0
+SmallWorld-Beta0.7_K13-Rho0.5_D3_W0.5_Neg-4kNodes_Sample28,Bivariate Equivalence Test,"K=8, #class1=511, #class2=665",0.0099900099900099,0.0166666666666666,Reject H0
+SmallWorld-Beta0.7_K13-Rho0.5_D3_W0.5_Neg-4kNodes_Sample29,KS Test,,0.2817668179057751,0.0166666666666666,Fail to Reject H0
+SmallWorld-Beta0.7_K13-Rho0.5_D3_W0.5_Neg-4kNodes_Sample29,Independence Test (Color: 0),"K_marg=8, K_joint=8, n_samples=1796",0.3126873126873127,0.0055555555555555,Fail to Reject H0
+SmallWorld-Beta0.7_K13-Rho0.5_D3_W0.5_Neg-4kNodes_Sample29,Independence Test (Color: 1),"K_marg=8, K_joint=8, n_samples=1794",0.5774225774225774,0.0055555555555555,Fail to Reject H0
+SmallWorld-Beta0.7_K13-Rho0.5_D3_W0.5_Neg-4kNodes_Sample29,Independence Test (Color: 2),"K_marg=8, K_joint=8, n_samples=1792",0.0329670329670329,0.0055555555555555,Fail to Reject H0
+SmallWorld-Beta0.7_K13-Rho0.5_D3_W0.5_Neg-4kNodes_Sample29,Bivariate Equivalence Test,"K=8, #class1=511, #class2=665",0.0139860139860139,0.0166666666666666,Reject H0
+SmallWorld-Beta0.7_K13-Rho0.5_D3_W0.5_Neg-4kNodes_Sample30,KS Test,,0.0005127837106285,0.0166666666666666,Reject H0
+SmallWorld-Beta0.7_K13-Rho0.5_D3_W0.5_Neg-4kNodes_Sample30,Independence Test (Color: 0),"K_marg=8, K_joint=8, n_samples=1796",0.4625374625374625,0.0055555555555555,Fail to Reject H0
+SmallWorld-Beta0.7_K13-Rho0.5_D3_W0.5_Neg-4kNodes_Sample30,Independence Test (Color: 1),"K_marg=8, K_joint=8, n_samples=1794",0.8121878121878122,0.0055555555555555,Fail to Reject H0
+SmallWorld-Beta0.7_K13-Rho0.5_D3_W0.5_Neg-4kNodes_Sample30,Independence Test (Color: 2),"K_marg=8, K_joint=8, n_samples=1792",0.7882117882117882,0.0055555555555555,Fail to Reject H0
+SmallWorld-Beta0.7_K13-Rho0.5_D3_W0.5_Neg-4kNodes_Sample30,Bivariate Equivalence Test,"K=8, #class1=511, #class2=665",0.0229770229770229,0.0166666666666666,Fail to Reject H0
+SmallWorld-Beta0.7_K13-Rho0.5_D3_W0.5_Neg-4kNodes_Sample31,KS Test,,0.1842850096345043,0.0166666666666666,Fail to Reject H0
+SmallWorld-Beta0.7_K13-Rho0.5_D3_W0.5_Neg-4kNodes_Sample31,Independence Test (Color: 0),"K_marg=8, K_joint=8, n_samples=1796",0.6143856143856143,0.0055555555555555,Fail to Reject H0
+SmallWorld-Beta0.7_K13-Rho0.5_D3_W0.5_Neg-4kNodes_Sample31,Independence Test (Color: 1),"K_marg=8, K_joint=8, n_samples=1794",0.984015984015984,0.0055555555555555,Fail to Reject H0
+SmallWorld-Beta0.7_K13-Rho0.5_D3_W0.5_Neg-4kNodes_Sample31,Independence Test (Color: 2),"K_marg=8, K_joint=8, n_samples=1792",0.3636363636363636,0.0055555555555555,Fail to Reject H0
+SmallWorld-Beta0.7_K13-Rho0.5_D3_W0.5_Neg-4kNodes_Sample31,Bivariate Equivalence Test,"K=8, #class1=511, #class2=665",0.0829170829170829,0.0166666666666666,Fail to Reject H0
+SmallWorld-Beta0.7_K13-Rho0.5_D3_W0.5_Neg-4kNodes_Sample32,KS Test,,0.3943756169941688,0.0166666666666666,Fail to Reject H0
+SmallWorld-Beta0.7_K13-Rho0.5_D3_W0.5_Neg-4kNodes_Sample32,Independence Test (Color: 0),"K_marg=8, K_joint=8, n_samples=1796",0.96003996003996,0.0055555555555555,Fail to Reject H0
+SmallWorld-Beta0.7_K13-Rho0.5_D3_W0.5_Neg-4kNodes_Sample32,Independence Test (Color: 1),"K_marg=8, K_joint=8, n_samples=1794",0.904095904095904,0.0055555555555555,Fail to Reject H0
+SmallWorld-Beta0.7_K13-Rho0.5_D3_W0.5_Neg-4kNodes_Sample32,Independence Test (Color: 2),"K_marg=8, K_joint=8, n_samples=1792",0.8591408591408591,0.0055555555555555,Fail to Reject H0
+SmallWorld-Beta0.7_K13-Rho0.5_D3_W0.5_Neg-4kNodes_Sample32,Bivariate Equivalence Test,"K=8, #class1=511, #class2=665",0.0259740259740259,0.0166666666666666,Fail to Reject H0
+SmallWorld-Beta0.7_K13-Rho0.5_D3_W0.5_Neg-4kNodes_Sample33,KS Test,,0.0823283326471466,0.0166666666666666,Fail to Reject H0
+SmallWorld-Beta0.7_K13-Rho0.5_D3_W0.5_Neg-4kNodes_Sample33,Independence Test (Color: 0),"K_marg=8, K_joint=8, n_samples=1796",0.976023976023976,0.0055555555555555,Fail to Reject H0
+SmallWorld-Beta0.7_K13-Rho0.5_D3_W0.5_Neg-4kNodes_Sample33,Independence Test (Color: 1),"K_marg=8, K_joint=8, n_samples=1794",0.998001998001998,0.0055555555555555,Fail to Reject H0
+SmallWorld-Beta0.7_K13-Rho0.5_D3_W0.5_Neg-4kNodes_Sample33,Independence Test (Color: 2),"K_marg=8, K_joint=8, n_samples=1792",0.997002997002997,0.0055555555555555,Fail to Reject H0
+SmallWorld-Beta0.7_K13-Rho0.5_D3_W0.5_Neg-4kNodes_Sample33,Bivariate Equivalence Test,"K=8, #class1=511, #class2=665",0.1358641358641358,0.0166666666666666,Fail to Reject H0
+SmallWorld-Beta0.7_K13-Rho0.5_D3_W0.5_Neg-4kNodes_Sample34,KS Test,,0.0054978121264334,0.0166666666666666,Reject H0
+SmallWorld-Beta0.7_K13-Rho0.5_D3_W0.5_Neg-4kNodes_Sample34,Independence Test (Color: 0),"K_marg=8, K_joint=8, n_samples=1796",0.5874125874125874,0.0055555555555555,Fail to Reject H0
+SmallWorld-Beta0.7_K13-Rho0.5_D3_W0.5_Neg-4kNodes_Sample34,Independence Test (Color: 1),"K_marg=8, K_joint=8, n_samples=1794",0.991008991008991,0.0055555555555555,Fail to Reject H0
+SmallWorld-Beta0.7_K13-Rho0.5_D3_W0.5_Neg-4kNodes_Sample34,Independence Test (Color: 2),"K_marg=8, K_joint=8, n_samples=1792",0.8221778221778222,0.0055555555555555,Fail to Reject H0
+SmallWorld-Beta0.7_K13-Rho0.5_D3_W0.5_Neg-4kNodes_Sample34,Bivariate Equivalence Test,"K=8, #class1=511, #class2=665",0.3166833166833167,0.0166666666666666,Fail to Reject H0
+SmallWorld-Beta0.7_K13-Rho0.5_D3_W0.5_Neg-4kNodes_Sample35,KS Test,,0.4364915538872427,0.0166666666666666,Fail to Reject H0
+SmallWorld-Beta0.7_K13-Rho0.5_D3_W0.5_Neg-4kNodes_Sample35,Independence Test (Color: 0),"K_marg=8, K_joint=8, n_samples=1796",0.5444555444555444,0.0055555555555555,Fail to Reject H0
+SmallWorld-Beta0.7_K13-Rho0.5_D3_W0.5_Neg-4kNodes_Sample35,Independence Test (Color: 1),"K_marg=8, K_joint=8, n_samples=1794",0.7932067932067932,0.0055555555555555,Fail to Reject H0
+SmallWorld-Beta0.7_K13-Rho0.5_D3_W0.5_Neg-4kNodes_Sample35,Independence Test (Color: 2),"K_marg=8, K_joint=8, n_samples=1792",0.9590409590409592,0.0055555555555555,Fail to Reject H0
+SmallWorld-Beta0.7_K13-Rho0.5_D3_W0.5_Neg-4kNodes_Sample35,Bivariate Equivalence Test,"K=8, #class1=511, #class2=665",0.0029970029970029,0.0166666666666666,Reject H0
+SmallWorld-Beta0.7_K13-Rho0.5_D3_W0.5_Neg-4kNodes_Sample36,KS Test,,0.0527349288183519,0.0166666666666666,Fail to Reject H0
+SmallWorld-Beta0.7_K13-Rho0.5_D3_W0.5_Neg-4kNodes_Sample36,Independence Test (Color: 0),"K_marg=8, K_joint=8, n_samples=1796",0.3836163836163836,0.0055555555555555,Fail to Reject H0
+SmallWorld-Beta0.7_K13-Rho0.5_D3_W0.5_Neg-4kNodes_Sample36,Independence Test (Color: 1),"K_marg=8, K_joint=8, n_samples=1794",0.8801198801198801,0.0055555555555555,Fail to Reject H0
+SmallWorld-Beta0.7_K13-Rho0.5_D3_W0.5_Neg-4kNodes_Sample36,Independence Test (Color: 2),"K_marg=8, K_joint=8, n_samples=1792",0.5314685314685315,0.0055555555555555,Fail to Reject H0
+SmallWorld-Beta0.7_K13-Rho0.5_D3_W0.5_Neg-4kNodes_Sample36,Bivariate Equivalence Test,"K=8, #class1=511, #class2=665",0.0289710289710289,0.0166666666666666,Fail to Reject H0
+SmallWorld-Beta0.7_K13-Rho0.5_D3_W0.5_Neg-4kNodes_Sample37,KS Test,,0.0455549529363152,0.0166666666666666,Fail to Reject H0
+SmallWorld-Beta0.7_K13-Rho0.5_D3_W0.5_Neg-4kNodes_Sample37,Independence Test (Color: 0),"K_marg=8, K_joint=8, n_samples=1796",0.8211788211788211,0.0055555555555555,Fail to Reject H0
+SmallWorld-Beta0.7_K13-Rho0.5_D3_W0.5_Neg-4kNodes_Sample37,Independence Test (Color: 1),"K_marg=8, K_joint=8, n_samples=1794",0.9630369630369632,0.0055555555555555,Fail to Reject H0
+SmallWorld-Beta0.7_K13-Rho0.5_D3_W0.5_Neg-4kNodes_Sample37,Independence Test (Color: 2),"K_marg=8, K_joint=8, n_samples=1792",0.8011988011988012,0.0055555555555555,Fail to Reject H0
+SmallWorld-Beta0.7_K13-Rho0.5_D3_W0.5_Neg-4kNodes_Sample37,Bivariate Equivalence Test,"K=8, #class1=511, #class2=665",0.0419580419580419,0.0166666666666666,Fail to Reject H0
+SmallWorld-Beta0.7_K13-Rho0.5_D3_W0.5_Neg-4kNodes_Sample38,KS Test,,0.3288423832689396,0.0166666666666666,Fail to Reject H0
+SmallWorld-Beta0.7_K13-Rho0.5_D3_W0.5_Neg-4kNodes_Sample38,Independence Test (Color: 0),"K_marg=8, K_joint=8, n_samples=1796",0.983016983016983,0.0055555555555555,Fail to Reject H0
+SmallWorld-Beta0.7_K13-Rho0.5_D3_W0.5_Neg-4kNodes_Sample38,Independence Test (Color: 1),"K_marg=8, K_joint=8, n_samples=1794",0.8661338661338661,0.0055555555555555,Fail to Reject H0
+SmallWorld-Beta0.7_K13-Rho0.5_D3_W0.5_Neg-4kNodes_Sample38,Independence Test (Color: 2),"K_marg=8, K_joint=8, n_samples=1792",0.0019980019980019,0.0055555555555555,Reject H0
+SmallWorld-Beta0.7_K13-Rho0.5_D3_W0.5_Neg-4kNodes_Sample38,Bivariate Equivalence Test,"K=8, #class1=511, #class2=665",0.0149850149850149,0.0166666666666666,Reject H0
+SmallWorld-Beta0.7_K13-Rho0.5_D3_W0.5_Neg-4kNodes_Sample39,KS Test,,0.2230956819212078,0.0166666666666666,Fail to Reject H0
+SmallWorld-Beta0.7_K13-Rho0.5_D3_W0.5_Neg-4kNodes_Sample39,Independence Test (Color: 0),"K_marg=8, K_joint=8, n_samples=1796",0.7462537462537463,0.0055555555555555,Fail to Reject H0
+SmallWorld-Beta0.7_K13-Rho0.5_D3_W0.5_Neg-4kNodes_Sample39,Independence Test (Color: 1),"K_marg=8, K_joint=8, n_samples=1794",0.4815184815184815,0.0055555555555555,Fail to Reject H0
+SmallWorld-Beta0.7_K13-Rho0.5_D3_W0.5_Neg-4kNodes_Sample39,Independence Test (Color: 2),"K_marg=8, K_joint=8, n_samples=1792",0.7422577422577422,0.0055555555555555,Fail to Reject H0
+SmallWorld-Beta0.7_K13-Rho0.5_D3_W0.5_Neg-4kNodes_Sample39,Bivariate Equivalence Test,"K=8, #class1=511, #class2=665",0.1028971028971029,0.0166666666666666,Fail to Reject H0
+SmallWorld-Beta0.7_K13-Rho0.5_D3_W0.5_Neg-4kNodes_Sample40,KS Test,,0.0135749161081413,0.0166666666666666,Reject H0
+SmallWorld-Beta0.7_K13-Rho0.5_D3_W0.5_Neg-4kNodes_Sample40,Independence Test (Color: 0),"K_marg=8, K_joint=8, n_samples=1796",0.8081918081918081,0.0055555555555555,Fail to Reject H0
+SmallWorld-Beta0.7_K13-Rho0.5_D3_W0.5_Neg-4kNodes_Sample40,Independence Test (Color: 1),"K_marg=8, K_joint=8, n_samples=1794",0.96003996003996,0.0055555555555555,Fail to Reject H0
+SmallWorld-Beta0.7_K13-Rho0.5_D3_W0.5_Neg-4kNodes_Sample40,Independence Test (Color: 2),"K_marg=8, K_joint=8, n_samples=1792",0.8521478521478522,0.0055555555555555,Fail to Reject H0
+SmallWorld-Beta0.7_K13-Rho0.5_D3_W0.5_Neg-4kNodes_Sample40,Bivariate Equivalence Test,"K=8, #class1=511, #class2=665",0.0179820179820179,0.0166666666666666,Fail to Reject H0
+SmallWorld-Beta0.7_K13-Rho0.5_D3_W0.5_Neg-4kNodes_Sample41,KS Test,,0.916320575029216,0.0166666666666666,Fail to Reject H0
+SmallWorld-Beta0.7_K13-Rho0.5_D3_W0.5_Neg-4kNodes_Sample41,Independence Test (Color: 0),"K_marg=8, K_joint=8, n_samples=1796",0.0009990009990009,0.0055555555555555,Reject H0
+SmallWorld-Beta0.7_K13-Rho0.5_D3_W0.5_Neg-4kNodes_Sample41,Independence Test (Color: 1),"K_marg=8, K_joint=8, n_samples=1794",0.0009990009990009,0.0055555555555555,Reject H0
+SmallWorld-Beta0.7_K13-Rho0.5_D3_W0.5_Neg-4kNodes_Sample41,Independence Test (Color: 2),"K_marg=8, K_joint=8, n_samples=1792",0.0009990009990009,0.0055555555555555,Reject H0
+SmallWorld-Beta0.7_K13-Rho0.5_D3_W0.5_Neg-4kNodes_Sample41,Bivariate Equivalence Test,"K=8, #class1=511, #class2=665",0.0869130869130869,0.0166666666666666,Fail to Reject H0
+SmallWorld-Beta0.7_K13-Rho0.5_D3_W0.5_Neg-4kNodes_Sample42,KS Test,,0.0011812432061303,0.0166666666666666,Reject H0
+SmallWorld-Beta0.7_K13-Rho0.5_D3_W0.5_Neg-4kNodes_Sample42,Independence Test (Color: 0),"K_marg=8, K_joint=8, n_samples=1796",0.904095904095904,0.0055555555555555,Fail to Reject H0
+SmallWorld-Beta0.7_K13-Rho0.5_D3_W0.5_Neg-4kNodes_Sample42,Independence Test (Color: 1),"K_marg=8, K_joint=8, n_samples=1794",0.7592407592407593,0.0055555555555555,Fail to Reject H0
+SmallWorld-Beta0.7_K13-Rho0.5_D3_W0.5_Neg-4kNodes_Sample42,Independence Test (Color: 2),"K_marg=8, K_joint=8, n_samples=1792",0.2357642357642357,0.0055555555555555,Fail to Reject H0
+SmallWorld-Beta0.7_K13-Rho0.5_D3_W0.5_Neg-4kNodes_Sample42,Bivariate Equivalence Test,"K=34, #class1=511, #class2=665",0.0089910089910089,0.0166666666666666,Reject H0
+SmallWorld-Beta0.7_K13-Rho0.5_D3_W0.5_Neg-4kNodes_Sample43,KS Test,,0.004419340997056,0.0166666666666666,Reject H0
+SmallWorld-Beta0.7_K13-Rho0.5_D3_W0.5_Neg-4kNodes_Sample43,Independence Test (Color: 0),"K_marg=8, K_joint=8, n_samples=1796",0.0229770229770229,0.0055555555555555,Fail to Reject H0
+SmallWorld-Beta0.7_K13-Rho0.5_D3_W0.5_Neg-4kNodes_Sample43,Independence Test (Color: 1),"K_marg=8, K_joint=8, n_samples=1794",0.7802197802197802,0.0055555555555555,Fail to Reject H0
+SmallWorld-Beta0.7_K13-Rho0.5_D3_W0.5_Neg-4kNodes_Sample43,Independence Test (Color: 2),"K_marg=8, K_joint=8, n_samples=1792",0.6113886113886113,0.0055555555555555,Fail to Reject H0
+SmallWorld-Beta0.7_K13-Rho0.5_D3_W0.5_Neg-4kNodes_Sample43,Bivariate Equivalence Test,"K=8, #class1=511, #class2=665",0.0009990009990009,0.0166666666666666,Reject H0
+SmallWorld-Beta0.7_K13-Rho0.5_D3_W0.5_Neg-4kNodes_Sample44,KS Test,,0.115863691368452,0.0166666666666666,Fail to Reject H0
+SmallWorld-Beta0.7_K13-Rho0.5_D3_W0.5_Neg-4kNodes_Sample44,Independence Test (Color: 0),"K_marg=8, K_joint=8, n_samples=1796",0.7332667332667333,0.0055555555555555,Fail to Reject H0
+SmallWorld-Beta0.7_K13-Rho0.5_D3_W0.5_Neg-4kNodes_Sample44,Independence Test (Color: 1),"K_marg=8, K_joint=8, n_samples=1794",1.0,0.0055555555555555,Fail to Reject H0
+SmallWorld-Beta0.7_K13-Rho0.5_D3_W0.5_Neg-4kNodes_Sample44,Independence Test (Color: 2),"K_marg=8, K_joint=8, n_samples=1792",0.8561438561438561,0.0055555555555555,Fail to Reject H0
+SmallWorld-Beta0.7_K13-Rho0.5_D3_W0.5_Neg-4kNodes_Sample44,Bivariate Equivalence Test,"K=8, #class1=511, #class2=665",0.4025974025974026,0.0166666666666666,Fail to Reject H0
+SmallWorld-Beta0.7_K13-Rho0.5_D3_W0.5_Neg-4kNodes_Sample45,KS Test,,0.0032383359192436,0.0166666666666666,Reject H0
+SmallWorld-Beta0.7_K13-Rho0.5_D3_W0.5_Neg-4kNodes_Sample45,Independence Test (Color: 0),"K_marg=8, K_joint=8, n_samples=1796",0.1948051948051948,0.0055555555555555,Fail to Reject H0
+SmallWorld-Beta0.7_K13-Rho0.5_D3_W0.5_Neg-4kNodes_Sample45,Independence Test (Color: 1),"K_marg=8, K_joint=8, n_samples=1794",0.0329670329670329,0.0055555555555555,Fail to Reject H0
+SmallWorld-Beta0.7_K13-Rho0.5_D3_W0.5_Neg-4kNodes_Sample45,Independence Test (Color: 2),"K_marg=8, K_joint=8, n_samples=1792",0.7272727272727273,0.0055555555555555,Fail to Reject H0
+SmallWorld-Beta0.7_K13-Rho0.5_D3_W0.5_Neg-4kNodes_Sample45,Bivariate Equivalence Test,"K=23, #class1=511, #class2=665",0.0049950049950049,0.0166666666666666,Reject H0
+SmallWorld-Beta0.7_K13-Rho0.5_D3_W0.5_Neg-4kNodes_Sample46,KS Test,,0.35427003825769,0.0166666666666666,Fail to Reject H0
+SmallWorld-Beta0.7_K13-Rho0.5_D3_W0.5_Neg-4kNodes_Sample46,Independence Test (Color: 0),"K_marg=8, K_joint=8, n_samples=1796",0.929070929070929,0.0055555555555555,Fail to Reject H0
+SmallWorld-Beta0.7_K13-Rho0.5_D3_W0.5_Neg-4kNodes_Sample46,Independence Test (Color: 1),"K_marg=8, K_joint=8, n_samples=1794",0.7882117882117882,0.0055555555555555,Fail to Reject H0
+SmallWorld-Beta0.7_K13-Rho0.5_D3_W0.5_Neg-4kNodes_Sample46,Independence Test (Color: 2),"K_marg=8, K_joint=8, n_samples=1792",0.4315684315684315,0.0055555555555555,Fail to Reject H0
+SmallWorld-Beta0.7_K13-Rho0.5_D3_W0.5_Neg-4kNodes_Sample46,Bivariate Equivalence Test,"K=8, #class1=511, #class2=665",0.0189810189810189,0.0166666666666666,Fail to Reject H0
+SmallWorld-Beta0.7_K13-Rho0.5_D3_W0.5_Neg-4kNodes_Sample47,KS Test,,2.0892029951361786e-06,0.0166666666666666,Reject H0
+SmallWorld-Beta0.7_K13-Rho0.5_D3_W0.5_Neg-4kNodes_Sample47,Independence Test (Color: 0),"K_marg=8, K_joint=8, n_samples=1796",0.932067932067932,0.0055555555555555,Fail to Reject H0
+SmallWorld-Beta0.7_K13-Rho0.5_D3_W0.5_Neg-4kNodes_Sample47,Independence Test (Color: 1),"K_marg=8, K_joint=8, n_samples=1794",0.2957042957042957,0.0055555555555555,Fail to Reject H0
+SmallWorld-Beta0.7_K13-Rho0.5_D3_W0.5_Neg-4kNodes_Sample47,Independence Test (Color: 2),"K_marg=8, K_joint=8, n_samples=1792",0.998001998001998,0.0055555555555555,Fail to Reject H0
+SmallWorld-Beta0.7_K13-Rho0.5_D3_W0.5_Neg-4kNodes_Sample47,Bivariate Equivalence Test,"K=9, #class1=511, #class2=665",0.0239760239760239,0.0166666666666666,Fail to Reject H0
+SmallWorld-Beta0.7_K13-Rho0.5_D3_W0.5_Neg-4kNodes_Sample48,KS Test,,0.4597766424327988,0.0166666666666666,Fail to Reject H0
+SmallWorld-Beta0.7_K13-Rho0.5_D3_W0.5_Neg-4kNodes_Sample48,Independence Test (Color: 0),"K_marg=8, K_joint=8, n_samples=1796",0.7472527472527473,0.0055555555555555,Fail to Reject H0
+SmallWorld-Beta0.7_K13-Rho0.5_D3_W0.5_Neg-4kNodes_Sample48,Independence Test (Color: 1),"K_marg=8, K_joint=8, n_samples=1794",0.7572427572427572,0.0055555555555555,Fail to Reject H0
+SmallWorld-Beta0.7_K13-Rho0.5_D3_W0.5_Neg-4kNodes_Sample48,Independence Test (Color: 2),"K_marg=8, K_joint=8, n_samples=1792",0.962037962037962,0.0055555555555555,Fail to Reject H0
+SmallWorld-Beta0.7_K13-Rho0.5_D3_W0.5_Neg-4kNodes_Sample48,Bivariate Equivalence Test,"K=8, #class1=511, #class2=665",0.1418581418581418,0.0166666666666666,Fail to Reject H0
+SmallWorld-Beta0.7_K13-Rho0.5_D3_W0.5_Neg-4kNodes_Sample49,KS Test,,0.0588339242165852,0.0166666666666666,Fail to Reject H0
+SmallWorld-Beta0.7_K13-Rho0.5_D3_W0.5_Neg-4kNodes_Sample49,Independence Test (Color: 0),"K_marg=8, K_joint=8, n_samples=1796",0.8901098901098901,0.0055555555555555,Fail to Reject H0
+SmallWorld-Beta0.7_K13-Rho0.5_D3_W0.5_Neg-4kNodes_Sample49,Independence Test (Color: 1),"K_marg=8, K_joint=8, n_samples=1794",0.999000999000999,0.0055555555555555,Fail to Reject H0
+SmallWorld-Beta0.7_K13-Rho0.5_D3_W0.5_Neg-4kNodes_Sample49,Independence Test (Color: 2),"K_marg=8, K_joint=8, n_samples=1792",0.2577422577422577,0.0055555555555555,Fail to Reject H0
+SmallWorld-Beta0.7_K13-Rho0.5_D3_W0.5_Neg-4kNodes_Sample49,Bivariate Equivalence Test,"K=27, #class1=511, #class2=665",0.1438561438561438,0.0166666666666666,Fail to Reject H0
+SmallWorld-Beta0.7_K13-Rho0.5_D3_W0.5_Neg-4kNodes_Sample50,KS Test,N/A,0.1778829020931438,0.016666666666666666,Fail to Reject H0
+SmallWorld-Beta0.7_K13-Rho0.5_D3_W0.5_Neg-4kNodes_Sample50,Independence Test (Color: 0),"K_marg=8, K_joint=8, n_samples=1796",0.8241758241758241,0.005555555555555556,Fail to Reject H0
+SmallWorld-Beta0.7_K13-Rho0.5_D3_W0.5_Neg-4kNodes_Sample50,Independence Test (Color: 1),"K_marg=8, K_joint=8, n_samples=1794",0.3106893106893107,0.005555555555555556,Fail to Reject H0
+SmallWorld-Beta0.7_K13-Rho0.5_D3_W0.5_Neg-4kNodes_Sample50,Independence Test (Color: 2),"K_marg=8, K_joint=8, n_samples=1792",0.954045954045954,0.005555555555555556,Fail to Reject H0
+SmallWorld-Beta0.7_K13-Rho0.5_D3_W0.5_Neg-4kNodes_Sample50,Bivariate Equivalence Test,"K=8, #class1=511, #class2=665",0.04795204795204795,0.016666666666666666,Fail to Reject H0
