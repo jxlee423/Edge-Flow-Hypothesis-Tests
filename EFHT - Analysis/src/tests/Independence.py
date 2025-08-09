@@ -91,12 +91,23 @@ def run_independence_test(df_reflected, config, results_manager):
         return np.mean(log_ratio)
 
     def generate_k_candidates_dynamic(data_size, num_candidates=20):
-        k_min = 8
+
+        # 1. Calculate the central K value
+        if data_size > 50:
+            k_min = 8
+        elif data_size > 25:
+            k_min = 4
+        else:
+            k_min = 2
+        # 2. Calculate k_max based on the square root rule
+        # k_max is the square root of the data size, but it should not be less than k_min
         k_max = int(np.sqrt(data_size))
+        k_max = max(k_max, k_min)
 
-        if k_max <= k_min:
+
+        if k_max == k_min:
             return [k_min]
-
+        
         log_candidates = np.logspace(
             np.log10(k_min),
             np.log10(k_max),
@@ -256,7 +267,7 @@ def run_independence_test(df_reflected, config, results_manager):
         print(f"   - Dynamically generated joint K candidates: {k_candidates_joint}")
         
         # Ensure there is enough data for CV
-        if len(marginal_train_data) < 10 * max(k_candidates_marginal) or len(joint_train_data) < 10 * max(k_candidates_joint):
+        if len(marginal_train_data) < 3 * max(k_candidates_marginal) or len(joint_train_data) < 3 * max(k_candidates_joint):
              print(f"Warning: Not enough data for cross-validation in color group {color}, skipping.")
              continue
          
