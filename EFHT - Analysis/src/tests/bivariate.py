@@ -17,9 +17,9 @@ def run_bivariate_test(D1_df, D2_df, D_all_df, config, results_manager):
     print(f"# of Edge Pairs in Class1 : {n_BED1}")
     print(f"# of Edge Pairs in Class2 : {n_BED2}")
     
-    if n_BED1 < 50 or n_BED2 < 50:
-        print("ERROR: Insufficient bivariate equivalence of distributions test data")
-        return None
+    # if n_BED1 <25 or n_BED2 < 25:
+    #     print("ERROR: Insufficient bivariate equivalence of distributions test data")
+    #     return None
     
     if n_BED3 < (n_BED1 + n_BED2):
         print("ERROR: n_BED3 < (n_BED1 + n_BED2)")
@@ -36,11 +36,19 @@ def run_bivariate_test(D1_df, D2_df, D_all_df, config, results_manager):
     # --- 2. Internal helper function definitions ---
     def generate_k_candidates_dynamic(data_size, num_candidates=20):
         # 1. Calculate the central K value
-        k_min = 8
+        if data_size > 50:
+            k_min = 8
+        elif data_size > 25:
+            k_min = 4
+        else:
+            k_min = 2
+        # 2. Calculate k_max based on the square root rule
+        # k_max is the square root of the data size, but it should not be less than k_min
         k_max = int(np.sqrt(data_size))
+        k_max = max(k_max, k_min)
 
-        # 2. Determine the starting point of the candidate range, ensuring it's not less than 8
-        if k_max <= k_min:
+
+        if k_max == k_min:
             return [k_min]
 
         log_candidates = np.logspace(
