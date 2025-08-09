@@ -306,7 +306,7 @@ def BEDT_Data_Preprocessing(df,dfall):
     return df0, df1, dfAll
 
 
-def Coloring(df):
+def Coloring(df, jobs=-1):
     """
     Groups edges based on the graph's edge coloring algorithm and creates pairs of the closest edges within each color group.
     This is to prepare the data required for the independence test.
@@ -407,7 +407,7 @@ def Coloring(df):
         return color_pairs
 
     all_colors = df_colored["color"].unique()
-    results = Parallel(n_jobs=-1, prefer="processes")(
+    results = Parallel(n_jobs=jobs, prefer="processes")(
         delayed(process_color)(color)
         for color in tqdm(sorted(all_colors), desc="Processing Colors")
     )
