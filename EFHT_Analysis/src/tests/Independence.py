@@ -1,11 +1,9 @@
 import numpy as np
 import matplotlib.pyplot as plt
 from sklearn.neighbors import NearestNeighbors
-from sklearn.model_selection import KFold
 from scipy.interpolate import interp1d
 from joblib import Parallel, delayed
 from tqdm import tqdm
-
 
 def run_independence_test(df_reflected, config, results_manager):
     
@@ -17,40 +15,36 @@ def run_independence_test(df_reflected, config, results_manager):
     EXTEND_RATIO = config.INDEPENDENCE_EXTEND_RATIO 
     RANDOM_STATE = config.RANDOM_STATE
     alpha = config.ALPHA
-    
-    # --- 2. Define plotting and helper functions ---
+
+    # --- 2. Define plotting and help functions ---
     def unified_knn_density(query_points, knn_model, k, dim):
         if query_points.shape[0] == 0:
             return np.array([])
-            
         distances, _ = knn_model.kneighbors(query_points)
         r_k = distances[:, -1]
-        
         if dim == 1:
             volume = 2 * r_k
         elif dim == 2:
             volume = np.pi * r_k**2
         else:
             raise ValueError("Only 1D or 2D data is supported")
-            
         n_samples = knn_model.n_samples_fit_
         return k / (n_samples * (volume + EPSILON))
-    
+
     class MarginalEstimator:
         def __init__(self, k):
             self.k = k
-            self.X = None
             self.knn = None
             self.cdf_func = None
-            
+
         def fit(self, data):
-            self.X = np.sort(data.flatten())
-            self.knn = NearestNeighbors(n_neighbors=self.k).fit(self.X.reshape(-1, 1))
-            
+            X = np.sort(data.flatten())
+            self.knn = NearestNeighbors(n_neighbors=self.k).fit(X.reshape(-1, 1))
+        
         def pdf(self, x):
             x_reshaped = np.array(x).reshape(-1, 1)
             return unified_knn_density(x_reshaped, self.knn, self.k, dim=1)
-            
+        
         def compute_cdf(self, GRID_SIZE, extend_ratio):
             """Numerically compute CDF and create interpolation function"""
             data_min = self.X.min()
@@ -63,7 +57,7 @@ def run_independence_test(df_reflected, config, results_manager):
             cdf_values = np.cumsum(pdf_values) * (grid[1] - grid[0])
             cdf_values /= cdf_values[-1]
             self.cdf_func = interp1d(grid, cdf_values, kind='linear', fill_value=(0, 1), bounds_error=False)
-            
+
         def sample(self, n_samples, rng):
             """Inverse transform sampling"""
             u = rng.random(n_samples)
@@ -76,77 +70,68 @@ def run_independence_test(df_reflected, config, results_manager):
         return np.column_stack((x_samples, y_samples))
 
     def compute_kl_divergence(samples, marginal_estimator, knn_joint, k_joint_val):
-        """Calculate KL(product || joint)"""
-            # Product density
         p_product_x = marginal_estimator.pdf(samples[:, 0])
         p_product_y = marginal_estimator.pdf(samples[:, 1])
         p_product = p_product_x * p_product_y
-        # Joint density
         p_joint = unified_knn_density(samples, knn_joint, k_joint_val, dim=2)
-        
-        log_p_product = np.log(p_product)
-        log_p_joint = np.log(p_joint)
-        
+        log_p_product = np.log(p_product + EPSILON)
+        log_p_joint = np.log(p_joint + EPSILON)
         log_ratio = log_p_product - log_p_joint
-        return np.mean(log_ratio)
-
-    def generate_k_candidates_dynamic(data_size, num_candidates=20):
-
-        # 1. Calculate the central K value
-        if data_size > 50:
-            k_min = 8
-        elif data_size > 25:
-            k_min = 4
-        else:
-            k_min = 2
-        # 2. Calculate k_max based on the square root rule
-        # k_max is the square root of the data size, but it should not be less than k_min
-        k_max = int(np.sqrt(data_size))
-        k_max = max(k_max, k_min)
-
-
-        if k_max == k_min:
-            return [k_min]
-        
-        log_candidates = np.logspace(
-            np.log10(k_min),
-            np.log10(k_max),
-            num=num_candidates
-        )
-
-        candidates = np.unique(np.round(log_candidates)).astype(int)
-        return candidates
-
-    def find_optimal_k_cv(data, k_candidates, dim, n_splits=5):
-        cv_scores = {}
-        for k in k_candidates:
-            if k >= len(data) * (n_splits - 1) / n_splits:
-                continue
-            
-            kf = KFold(n_splits=n_splits, shuffle=True, random_state=RANDOM_STATE)
-            fold_log_likelihoods = []
-            
-            for train_idx, val_idx in kf.split(data):
-                train_data, val_data = data[train_idx], data[val_idx]
-                if k >= len(train_data): continue
-                
-                if dim == 1:
-                    train_data = train_data.reshape(-1, 1)
-                    val_data = val_data.reshape(-1, 1)
-
-                if val_data.shape[0] == 0: continue
-
-                knn = NearestNeighbors(n_neighbors=k).fit(train_data)
-                densities = unified_knn_density(val_data, knn, k, dim)
-                fold_log_likelihoods.append(np.sum(np.log(np.maximum(densities, EPSILON))))
-            
-            if fold_log_likelihoods:
-                cv_scores[k] = np.mean(fold_log_likelihoods)
-        
-        return max(cv_scores, key=cv_scores.get) if cv_scores else k_candidates[0]
+        return np.mean(log_ratio), log_ratio
     
-    # ================== plotting helper function ==================
-    
+    def simulate_kl_divergence_job(seed):
+        job_rng = np.random.default_rng(seed)
+        n_total_samples = len(current_edges) * 2
+        all_sim_samples = sample_product_distribution(marginal_estimator, n_total_samples, job_rng)
+        train_samples = all_sim_samples[:len(current_edges)]
+        eval_samples = all_sim_samples[len(current_edges):]
+        knn_sim = NearestNeighbors(n_neighbors=optimal_k_joint).fit(train_samples)
+        mean_kl, log_ratios = compute_kl_divergence(eval_samples, marginal_estimator, knn_sim, optimal_k_joint)
+        return mean_kl, log_ratios
+
+    def find_k(data):
+        n_samples = len(data)
+        k = int(np.sqrt(n_samples))
+        k = max(2, k)
+        return k
+
+    def visualize_1d_fit(marginal_estimator, data, k_value, title, color, results_manager):
+        fig, ax = plt.subplots(figsize=(12, 7))
+        ax.hist(data, bins=100, density=True, color='gray', alpha=0.5, label='Data Histogram (Ground Truth)')
+        x_grid = np.linspace(data.min(), data.max(), 500)
+        pdf_fit = marginal_estimator.pdf(x_grid)
+        ax.plot(x_grid, pdf_fit, 'b-', lw=2, label=f'1D-KNN PDF Fit (k={k_value})')
+        ax.set_title(title, fontsize=16)
+        ax.set_xlabel('Flow Value')
+        ax.set_ylabel('Density')
+        ax.legend()
+        ax.grid(True)
+        test_name = f"independence_test/color_{color}"
+        results_manager.save_plot(fig, "1d_knn_pdf_fit.png", test_name=test_name)
+
+    def visualize_2d_fit(joint_data, knn_model, k_value, title, color, results_manager):
+        fig, ax = plt.subplots(figsize=(10, 8))
+        x_min, x_max = joint_data[:, 0].min(), joint_data[:, 0].max()
+        y_min, y_max = joint_data[:, 1].min(), joint_data[:, 1].max()
+        x_range, y_range = x_max - x_min, y_max - y_min
+        grid_x = np.linspace(x_min - 0.1 * x_range, x_max + 0.1 * x_range, 100)
+        grid_y = np.linspace(y_min - 0.1 * y_range, y_max + 0.1 * y_range, 100)
+        XX, YY = np.meshgrid(grid_x, grid_y)
+        grid_points = np.c_[XX.ravel(), YY.ravel()]
+        Z_joint = unified_knn_density(grid_points, knn_model, k_value, dim=2).reshape(XX.shape)
+        contour = ax.contourf(XX, YY, Z_joint, levels=20, cmap='viridis', alpha=0.7)
+        fig.colorbar(contour, ax=ax, label='Estimated Density')
+        ax.contour(XX, YY, Z_joint, levels=contour.levels, colors='white', linewidths=0.5)
+        ax.scatter(joint_data[:, 0], joint_data[:, 1], c='red', s=10, alpha=0.5, label='Original Data Points')
+        ax.set_xlabel('flowX')
+        ax.set_ylabel('flowY')
+        ax.set_title(title, fontsize=16)
+        ax.legend()
+        ax.grid(True)
+        ax.set_aspect('equal', adjustable='box')
+        test_name = f"independence_test/color_{color}"
+        results_manager.save_plot(fig, "1d_knn_pdf_fit.png", test_name=test_name)
+
     def plot_scatter(current_edges, non_current_edges, color, results_manager):
         fig, ax = plt.subplots(figsize=(8, 8))
         ax.scatter(
@@ -241,6 +226,22 @@ def run_independence_test(df_reflected, config, results_manager):
         color_test_name = f"independence_test/color_{color}"
         results_manager.save_plot(fig, "2d_density_comparison.png", test_name=color_test_name)
 
+    def plot_log_ratio_distribution(obs_log_ratios, null_log_ratios_sample, color, results_manager):
+        fig, ax = plt.subplots(figsize=(12, 7))
+        ax.hist(obs_log_ratios, bins=50, density=True, color='red', alpha=0.6, label=f'Observed Log Ratios (Mean={np.mean(obs_log_ratios):.2f})')
+        ax.hist(null_log_ratios_sample, bins=50, density=True, color='blue', alpha=0.6, label=f'Null Log Ratios (A Sample from Null Distribution, Mean={np.mean(null_log_ratios_sample):.2f})')
+
+        ax.set_title(f'Distribution of Per-Point Log Ratios for Color {color}', fontsize=16)
+        ax.set_xlabel('Log Ratio = log(P_product) - log(P_joint)')
+        ax.set_ylabel('Density')
+        ax.legend()
+        ax.grid(True)
+        ax.axvline(0, color='black', linestyle='--', lw=2, label='Zero Line')
+        
+        fig.tight_layout()
+        color_test_name = f"independence_test/color_{color}"
+        results_manager.save_plot(fig, "log_ratio_distribution.png", test_name=color_test_name)
+
     # --- 3. Filter color groups to be tested ---
     color_counts = df_reflected['color'].value_counts()
     top_colors = color_counts.head(TOP_N_COLORS).index.tolist()
@@ -248,90 +249,61 @@ def run_independence_test(df_reflected, config, results_manager):
 
     all_results = []
 
-    # --- 4. Iterate through each color group to perform the test ---
+    # --- 4. Main analysis loop for each color ---
     for color in top_colors:
         print(f"\n--- Analyzing color group: {color} ---")
-        
+        rng = np.random.default_rng(RANDOM_STATE)
         current_edges = df_reflected[df_reflected['color'] == color]
         non_current_edges = df_reflected[df_reflected['color'] != color]
         
-        # a. Dynamically select the optimal K value
-        print("  - Selecting optimal K value via cross-validation...")
         marginal_train_data = np.concatenate([non_current_edges['flowX'], non_current_edges['flowY']])
         joint_train_data = current_edges[['flowX', 'flowY']].values
-        
-        k_candidates_marginal = generate_k_candidates_dynamic(len(marginal_train_data))
-        k_candidates_joint = generate_k_candidates_dynamic(len(joint_train_data))
+                 
+        # a. Select K using the robust heuristic
+        optimal_k_marginal = find_k(marginal_train_data)
+        optimal_k_joint = find_k(joint_train_data)
+        print(f"  - K_MARGINAL = {optimal_k_marginal}, K_JOINT = {optimal_k_joint}")
 
-        print(f"   - Dynamically generated marginal K candidates: {k_candidates_marginal}")
-        print(f"   - Dynamically generated joint K candidates: {k_candidates_joint}")
-        
-        # Ensure there is enough data for CV
-        if len(marginal_train_data) < 3 * max(k_candidates_marginal) or len(joint_train_data) < 3 * max(k_candidates_joint):
-             print(f"Warning: Not enough data for cross-validation in color group {color}, skipping.")
-             continue
-         
-        optimal_k_marginal = find_optimal_k_cv(marginal_train_data, k_candidates_marginal, dim=1)
-        optimal_k_joint = find_optimal_k_cv(joint_train_data, k_candidates_joint, dim=2)
-        print(f"  - Optimal K_MARGINAL = {optimal_k_marginal}, Optimal K_JOINT = {optimal_k_joint}")
-
-        rng = np.random.default_rng(RANDOM_STATE)
         # b. Estimate the marginal distribution
         marginal_estimator = MarginalEstimator(k=optimal_k_marginal)
         marginal_estimator.fit(marginal_train_data)
         marginal_estimator.compute_cdf(GRID_SIZE, EXTEND_RATIO)
-        
+
         # c. Estimate the joint distribution
         knn_joint = NearestNeighbors(n_neighbors=optimal_k_joint).fit(joint_train_data)
+        
+        print("  - Generating diagnostic plots for 1D and 2D fits...")
+        visualize_1d_fit(marginal_estimator, marginal_train_data, optimal_k_marginal,
+                         f"1D Marginal PDF Fit (k={optimal_k_marginal})", color, results_manager)
+        visualize_2d_fit(joint_train_data, knn_joint, optimal_k_joint,
+                         f"2D Joint PDF Fit for Color {color} (k={optimal_k_joint})", color, results_manager)
 
         # d. Calculate the observed KL divergence
+        
         product_samples = sample_product_distribution(marginal_estimator, len(current_edges), rng)
-        obs_kl = compute_kl_divergence(product_samples, marginal_estimator, knn_joint, optimal_k_joint)
+        obs_kl, obs_log_ratios = compute_kl_divergence(product_samples, marginal_estimator, knn_joint, optimal_k_joint)
         print(f"  - Observed KL divergence = {obs_kl:.4f}")
 
-        # e. Simulate the null distribution
-        def simulate_kl_divergence_job(seed):
-            job_rng = np.random.default_rng(seed)
-            
-            # 1. Generate twice as many samples
-            n_total_samples = len(current_edges) * 2
-            all_sim_samples = sample_product_distribution(marginal_estimator, n_total_samples, job_rng)
-            
-            # 2. Split the sample in half
-            # training
-            train_samples = all_sim_samples[:len(current_edges)]
-            # evaluation/testing
-            eval_samples = all_sim_samples[len(current_edges):]
-            
-            # 3. Fit a new KNN model using training samples
-            # This model has never been seen eval_samples
-            knn_sim = NearestNeighbors(n_neighbors=optimal_k_joint).fit(train_samples)
-            
-            # 4. Use evaluation samples to calculate KL
-            return compute_kl_divergence(eval_samples, marginal_estimator, knn_sim, optimal_k_joint)
-        
-        # Generate unique, reproducible seeds for each parallel task
+        # e. Simulate the null distribution (YOUR ORIGINAL METHOD)
         seeds = [RANDOM_STATE + i for i in range(N_SIMULATIONS)]
-        
-        null_kls = Parallel(n_jobs=-1)(
+        simulate_results_list = Parallel(n_jobs=-1)(
             delayed(simulate_kl_divergence_job)(s)
             for s in tqdm(seeds, desc=f"Simulating null distribution (Color {color})")
         )
 
-        # e. Calculate the p-value
+        # 将结果拆分为均值列表和详细数组列表
+        null_kls = [item[0] for item in simulate_results_list]
+        null_log_ratios_list = [item[1] for item in simulate_results_list]
+
+        # f. Calculate the p-value
         p_value = (np.sum(np.array(null_kls) >= obs_kl) + 1) / (N_SIMULATIONS + 1)
         
-        # f. Generating visualizations
+        # g. Generating ALL visualizations, including the new one
         plot_scatter(current_edges, non_current_edges, color, results_manager)
         plot_kl_distribution(null_kls, obs_kl, p_value, color, results_manager)
-        plot_2d_density_comparison(
-            knn_joint, 
-            optimal_k_joint, 
-            marginal_estimator, 
-            current_edges, 
-            color, 
-            results_manager
-        )
+        plot_2d_density_comparison(knn_joint, optimal_k_joint, marginal_estimator, current_edges, color, results_manager)
+        plot_log_ratio_distribution(obs_log_ratios, null_log_ratios_list[0], color, results_manager)
+        
         
         color_result = {
         'color': int(color),
@@ -339,21 +311,19 @@ def run_independence_test(df_reflected, config, results_manager):
         'observed_kl': float(obs_kl),
         'p_value': float(p_value),
         'optimal_k_marginal': int(optimal_k_marginal),
-        'optimal_k_joint': int(optimal_k_joint), 
-        'k_candidates_marginal': [int(k) for k in k_candidates_marginal],
-        'k_candidates_joint': [int(k) for k in k_candidates_joint]
+        'optimal_k_joint': int(optimal_k_joint)
     }
         results_manager.save_json(color_result, "result.json", test_name=f"independence_test/color_{color}")
-        results_manager.add_to_report(f"Independence Test (Color: {color})", p_value, alpha/9, params=f"K_marg={optimal_k_marginal}, K_joint={optimal_k_joint}, n_samples={len(current_edges)}")
+        results_manager.add_to_report(f"Independence Test (Color: {color})", p_value, alpha/(3*TOP_N_COLORS), params=f"K_marg={optimal_k_marginal}, K_joint={optimal_k_joint}, #target_color_samples={len(current_edges)}")
         
         print(f"\n--- Independence Test Result for Color: {color} ---")
         print(f"P value: {p_value:.4f}")
         
-        if p_value < alpha/9:
-            print(f"Conclusion: Reject the null hypothesis (p < {alpha/9}).")
+        if p_value < alpha/(3*TOP_N_COLORS):
+            print(f"Conclusion: Reject the null hypothesis (p < {alpha/(3*TOP_N_COLORS)}).")
             print("           The variables 'flowX' and 'flowY' are likely DEPENDENT for this color group.")
         else:
-            print(f"Conclusion: Fail to reject the null hypothesis (p >= {alpha/9}).")
+            print(f"Conclusion: Fail to reject the null hypothesis (p >= {alpha/(3*TOP_N_COLORS)}).")
             print("           There is no significant evidence that 'flowX' and 'flowY' are dependent.")
             
         all_results.append(color_result)

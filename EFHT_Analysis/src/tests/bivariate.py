@@ -17,10 +17,6 @@ def run_bivariate_test(D1_df, D2_df, D_all_df, config, results_manager):
     print(f"# of Edge Pairs in Class1 : {n_BED1}")
     print(f"# of Edge Pairs in Class2 : {n_BED2}")
     
-    # if n_BED1 <25 or n_BED2 < 25:
-    #     print("ERROR: Insufficient bivariate equivalence of distributions test data")
-    #     return None
-    
     if n_BED3 < (n_BED1 + n_BED2):
         print("ERROR: n_BED3 < (n_BED1 + n_BED2)")
         return None
@@ -34,32 +30,6 @@ def run_bivariate_test(D1_df, D2_df, D_all_df, config, results_manager):
     RANDOM_STATE = config.RANDOM_STATE
     
     # --- 2. Internal helper function definitions ---
-    def generate_k_candidates_dynamic(data_size, num_candidates=20):
-        # 1. Calculate the central K value
-        if data_size > 50:
-            k_min = 8
-        elif data_size > 25:
-            k_min = 4
-        else:
-            k_min = 2
-        # 2. Calculate k_max based on the square root rule
-        # k_max is the square root of the data size, but it should not be less than k_min
-        k_max = int(np.sqrt(data_size))
-        k_max = max(k_max, k_min)
-
-
-        if k_max == k_min:
-            return [k_min]
-
-        log_candidates = np.logspace(
-            np.log10(k_min),
-            np.log10(k_max),
-            num=num_candidates
-        )
-
-        # 3. Process the float candidates into a unique, sorted list of integers
-        candidates = np.unique(np.round(log_candidates)).astype(int)
-        return candidates
     # ===================== KNN Density Estimation Function =====================    
     def knn_density(query_points, data_points, k):
         knn = NearestNeighbors(n_neighbors=k).fit(data_points)
@@ -67,35 +37,6 @@ def run_bivariate_test(D1_df, D2_df, D_all_df, config, results_manager):
         r_k = distances[:, -1]
         volume = np.pi * r_k**2
         return k / (len(data_points) * (volume + EPSILON))
-    # ===================== Optimal_K Function =====================
-    def find_optimal_k_cv(data, k_values, n_splits=5):
-        cv_scores = {}
-        for k in k_values:
-            min_train_size = len(data) * (n_splits - 1) / n_splits
-            if k >= min_train_size:
-                print(f"Skipping K={k} because it's too large for the training fold size.")
-                continue
-            
-            kf = KFold(n_splits=n_splits, shuffle=True, random_state=RANDOM_STATE)
-            fold_log_likelihoods = []
-            
-            for train_index, val_index in kf.split(data):
-                train_data, val_data = data[train_index], data[val_index]
-                
-                if k >= len(train_data): 
-                    continue
-                # Calculate densities on the validation set
-                densities = knn_density(val_data, train_data, k)
-                # Calculate log-likelihood 
-                log_likelihood = np.sum(np.log(np.maximum(densities, EPSILON)))
-                fold_log_likelihoods.append(log_likelihood)
-            # Calculate the average log-likelihood for this K value
-            if fold_log_likelihoods:
-                cv_scores[k] = np.mean(fold_log_likelihoods)
-        # Find the K with the highest score
-        best_k = max(cv_scores, key=cv_scores.get)
-        
-        return best_k
     # ===================== SKL Computation Function =====================
     def compute_skl(d1_sub, d2_sub, k):
         all_points = np.concatenate([d1_sub, d2_sub])
@@ -159,61 +100,70 @@ def run_bivariate_test(D1_df, D2_df, D_all_df, config, results_manager):
         EPSILON = config.EPSILON
 
         all_points = np.concatenate([d1, d2])
-        global_min = all_points.min()
-        global_max = all_points.max()
+        global_min = all_points.min(axis=0)
+        global_max = all_points.max(axis=0)
         margin = (global_max - global_min) * EXTEND_RATIO
 
         axis_min = global_min - margin
         axis_max = global_max + margin
         
-        x_grid = np.linspace(axis_min, axis_max, GRID_SIZE)
-        y_grid = np.linspace(axis_min, axis_max, GRID_SIZE)
+        x_grid = np.linspace(axis_min[0], axis_max[0], GRID_SIZE)
+        y_grid = np.linspace(axis_min[1], axis_max[1], GRID_SIZE)
         XX, YY = np.meshgrid(x_grid, y_grid)
         grid_points = np.c_[XX.ravel(), YY.ravel()]
 
+        # Estimate densities for P (from d1) and Q (from d2)
         P = knn_density(grid_points, d1, k).reshape(XX.shape)
         Q = knn_density(grid_points, d2, k).reshape(XX.shape)
 
         vmax_density = max(np.max(P), np.max(Q))
 
-        fig, axes = plt.subplots(1, 3, figsize=(24, 7))
+        fig, axes = plt.subplots(1, 3, figsize=(24, 8))
+        fig.suptitle(f'Bivariate Fit Diagnostic and Comparison (k={k})', fontsize=20)
 
-        for ax in axes:
+
+        for i, ax in enumerate(axes):
             ax.set_xlabel('Flow 1')
             ax.set_aspect('equal', adjustable='box')
-            ax.set_xlim(axis_min, axis_max)
-            ax.set_ylim(axis_min, axis_max)
+            ax.set_xlim(axis_min[0], axis_max[0])
+            ax.set_ylim(axis_min[1], axis_max[1])
             ax.grid(True)
         axes[0].set_ylabel('Flow 2')
 
+        # --- Plot 1: Density of Class 1 (P) with data points ---
         cp1 = axes[0].contourf(XX, YY, P, levels=20, cmap='viridis', vmin=0, vmax=vmax_density)
         fig.colorbar(cp1, ax=axes[0])
-        axes[0].set_title('Density of Class 1 (P)')
+        axes[0].contour(XX, YY, P, levels=cp1.levels, colors='white', linewidths=0.5, alpha=0.8)
+        axes[0].scatter(d1[:, 0], d1[:, 1], c='red', s=8, alpha=0.4, label='Class 1 Data Points')
+        axes[0].set_title('Density Fit for Class 1 (P)', fontsize=16)
+        axes[0].legend()
 
+
+        # --- Plot 2: Density of Class 2 (Q) with data points ---
         cp2 = axes[1].contourf(XX, YY, Q, levels=20, cmap='viridis', vmin=0, vmax=vmax_density)
         fig.colorbar(cp2, ax=axes[1])
-        axes[1].set_title('Density of Class 2 (Q)')
+        axes[1].contour(XX, YY, Q, levels=cp2.levels, colors='white', linewidths=0.5, alpha=0.8)
+        axes[1].scatter(d2[:, 0], d2[:, 1], c='red', s=8, alpha=0.4, label='Class 2 Data Points')
+        axes[1].set_title('Density Fit for Class 2 (Q)', fontsize=16)
+        axes[1].legend()
 
+        # --- Plot 3: Log Ratio of Densities ---
         log_ratio = np.log(P + EPSILON) - np.log(Q + EPSILON)
         max_abs = np.max(np.abs(log_ratio))
         cp3 = axes[2].contourf(XX, YY, log_ratio, levels=20, cmap='coolwarm', vmin=-max_abs, vmax=max_abs)
         fig.colorbar(cp3, ax=axes[2])
-        axes[2].set_title('Log Ratio: log(P / Q)')
+        axes[2].set_title('Log Ratio: log(P / Q)', fontsize=16)
 
-        fig.tight_layout()
+        fig.tight_layout(rect=[0, 0.03, 1, 0.95]) # Adjust layout to make space for suptitle
         
-        results_manager.save_plot(fig, "density_comparison.png", test_name="bivariate_test")
-    
-    
+        results_manager.save_plot(fig, "density_fit_comparison.png", test_name="bivariate_test")
+
     # --- 3. Finding the optimal K value through cross-validation---
-    print("Finding optimal K using cross-validation on combined data...")
-    D_all_cv = np.concatenate((D1, D2))
-    k_candidates = generate_k_candidates_dynamic(len(D_all_cv))
-    print(f"Dynamically generated K candidates: {k_candidates}")
-    
-    K_optimal = find_optimal_k_cv(D_all_cv, k_candidates)
-    print(f"Optimal K selected via Cross-Validation: {K_optimal}")
-    
+    n_min = min(n_BED1, n_BED2)
+    K_optimal = int(np.sqrt(n_min))
+    K_optimal = max(2, K_optimal)
+    print(f"Optimal K: {K_optimal}")
+
     # --- 4. Oberserved KL computation ---
     obs_kl = compute_skl(D1, D2, K_optimal)
     print(f"Observed KL = {obs_kl:.4f}")
@@ -228,8 +178,6 @@ def run_bivariate_test(D1_df, D2_df, D_all_df, config, results_manager):
     # --- 6. P-value computation ---
     p_value = (np.sum(np.array(null_distribution) >= obs_kl) + 1) / (N_PERMUTATIONS + 1)
     
-    plot_2d_density_comparison(D1, D2, K_optimal, config, results_manager)
-
     # --- 7. Generate and save all visualizations ---  
     plot_skl_distribution(null_distribution, obs_kl, p_value, results_manager)
     plot_scatter(D1, D2, results_manager)
@@ -240,7 +188,6 @@ def run_bivariate_test(D1_df, D2_df, D_all_df, config, results_manager):
         'observed_skl': float(obs_kl),
         'p_value': float(p_value),
         'optimal_k': int(K_optimal),
-        'k_candidates': [int(k) for k in k_candidates],
         '#class1': int(n_BED1),
         '#class2': int(n_BED2)
     }

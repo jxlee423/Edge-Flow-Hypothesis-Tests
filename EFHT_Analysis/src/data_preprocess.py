@@ -414,7 +414,7 @@ def Coloring(df, jobs=-1):
     
     all_flow_pairs = pd.DataFrame([item for sublist in results for item in sublist])
     reflected = all_flow_pairs.copy()
-    reflected['flowX'], reflected['flowY'] = all_flow_pairs['flowX'], all_flow_pairs['flowY']
+    reflected['flowX'], reflected['flowY'] = all_flow_pairs['flowY'], all_flow_pairs['flowX']
     ind_data = pd.concat([all_flow_pairs, reflected], ignore_index = True)
     
     return ind_data
