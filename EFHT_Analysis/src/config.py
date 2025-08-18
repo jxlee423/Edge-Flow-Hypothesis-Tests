@@ -1,6 +1,6 @@
 
 # --- Dataset Configuration ---
-OUTPUTS_DIR = "outputs"
+OUTPUTS_DIR = "results/SmallWorld_Neg"
 
 # --- Test Parameters ---
 # General Parameters
