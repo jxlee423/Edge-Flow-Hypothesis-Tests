@@ -1,2 +1,4 @@
 "*.log" 
 "*.tmp"
+EFHT_Analysis/results/
+**/.DS_Store
