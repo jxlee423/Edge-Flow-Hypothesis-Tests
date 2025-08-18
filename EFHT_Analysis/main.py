@@ -3,7 +3,7 @@ import pandas as pd
 from src import config
 from src.results_manager import ResultsManager
 from src import data_preprocess
-from src.tests import ks, bivariate_0819ver, independence_0819ver
+from src.tests import ks, bivariate, independence
 import os
 
 def main(input_path, dataset_id, batch_id, run_ks, run_independence, run_bivariate, jobs):
@@ -75,7 +75,7 @@ def main(input_path, dataset_id, batch_id, run_ks, run_independence, run_bivaria
     # Independence Test
     if run_independence:
         print("\n--- 2. Running Independence tests ---")
-        independence_0819ver.run_independence_test(
+        independence.run_independence_test(
             df_ind_data,
             config,
             results
@@ -84,7 +84,7 @@ def main(input_path, dataset_id, batch_id, run_ks, run_independence, run_bivaria
     # Bivariate Equivalence Test
     if run_bivariate:
         print("\n--- 3. Running Bivariate Equivalence Test ---")
-        bivariate_0819ver.run_bivariate_test(
+        bivariate.run_bivariate_test(
             df0,
             df1,
             dfAll,
