@@ -3,3 +3,4 @@
 EFHT_Analysis/results/
 **/.DS_Store
 EFHT_Analysis/plot.ipynb
+__pycache__/
