@@ -34,6 +34,7 @@ def run_independence_test(df_reflected, config, results_manager):
     class MarginalEstimator:
         def __init__(self, k):
             self.k = k
+            self.X = None
             self.knn = None
             self.cdf_func = None
 
