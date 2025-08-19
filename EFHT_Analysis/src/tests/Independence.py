@@ -39,13 +39,13 @@ def run_independence_test(df_reflected, config, results_manager):
             self.cdf_func = None
 
         def fit(self, data):
-            X = np.sort(data.flatten())
-            self.knn = NearestNeighbors(n_neighbors=self.k).fit(X.reshape(-1, 1))
-        
+            self.X = np.sort(data.flatten())
+            self.knn = NearestNeighbors(n_neighbors=self.k).fit(self.X.reshape(-1, 1))
+            
         def pdf(self, x):
             x_reshaped = np.array(x).reshape(-1, 1)
             return unified_knn_density(x_reshaped, self.knn, self.k, dim=1)
-        
+            
         def compute_cdf(self, GRID_SIZE, extend_ratio):
             """Numerically compute CDF and create interpolation function"""
             data_min = self.X.min()
@@ -58,11 +58,11 @@ def run_independence_test(df_reflected, config, results_manager):
             cdf_values = np.cumsum(pdf_values) * (grid[1] - grid[0])
             cdf_values /= cdf_values[-1]
             self.cdf_func = interp1d(grid, cdf_values, kind='linear', fill_value=(0, 1), bounds_error=False)
-
+            
         def sample(self, n_samples, rng):
             """Inverse transform sampling"""
             u = rng.random(n_samples)
-            return np.interp(u, self.cdf_func.y, self.cdf_func.x) 
+            return np.interp(u, self.cdf_func.y, self.cdf_func.x)
     
     def sample_product_distribution(estimator, n_samples, rng):
         """Sample from product distribution"""
@@ -131,7 +131,7 @@ def run_independence_test(df_reflected, config, results_manager):
         ax.grid(True)
         ax.set_aspect('equal', adjustable='box')
         test_name = f"independence_test/color_{color}"
-        results_manager.save_plot(fig, "1d_knn_pdf_fit.png", test_name=test_name)
+        results_manager.save_plot(fig, "2d_knn_pdf_fit.png", test_name=test_name)
 
     def plot_scatter(current_edges, non_current_edges, color, results_manager):
         fig, ax = plt.subplots(figsize=(8, 8))
