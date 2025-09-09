@@ -2,6 +2,7 @@ import pandas as pd
 import networkx as nx
 import numpy as np
 import copy
+import graph_tool.all as gt
 from tqdm import tqdm
 from joblib import Parallel, delayed
 from collections import defaultdict
@@ -12,6 +13,7 @@ def Classifying(df):
     Classifies edges based on two metrics: "edge betweenness" and "sum of degrees".
     - Class 1: Edges where both edge betweenness and sum of degrees are in the top 25%.
     - Class 2: Edges where both edge betweenness and sum of degrees are in the bottom 25%.
+    Uses graph-tool
     """
     df_class = df.copy()
     
@@ -23,48 +25,48 @@ def Classifying(df):
             df_class.at[index, "node2"] = u
             
     # 2. Create graph and calculate the two core metrics
-    G = nx.Graph()
-    G = nx.from_pandas_edgelist(df_class, 'node1', 'node2')
+
+    g = gt.Graph(directed=False)
+    g.vp.ids = g.add_edge_list(df_class[['node1', 'node2']].values, 
+                                hashed=True, 
+                                hash_type='int64_t')
 
     # --- Metric 1: Edge Betweenness ---
-    edge_betweenness = nx.edge_betweenness_centrality(G)
-    def _get_betweenness(row):
-        u, v = row['node1'], row['node2']
-        return edge_betweenness.get((u, v), edge_betweenness.get((v, u), 0.0))
-    df_class['betweenness'] = df_class.apply(_get_betweenness, axis=1)
+    _, e_bet = gt.betweenness(g, norm=True)
+    df_class['betweenness'] = e_bet.fa
 
     # --- Metric 2: Sum of Degrees ---
-    node_degrees = dict(G.degree())
-    def _get_edge_degree(row):
-        return node_degrees.get(row['node1'], 0) + node_degrees.get(row['node2'], 0)
-    df_class['degree'] = df_class.apply(_get_edge_degree, axis=1)
+    deg = g.degree_property_map("total")
     
-    # 3. Determine the Top 75% and Bottom 25% thresholds
+    node_degrees_dict = {g.vp.ids[v]: deg[v] for v in g.vertices()}
+    
+    degree1 = df_class['node1'].map(node_degrees_dict)
+    degree2 = df_class['node2'].map(node_degrees_dict)
+    df_class['degree'] = degree1 + degree2
+
+    print("Metrics calculated.")
+    
+    # 3. Determine thresholds
     betweenness_top = df_class['betweenness'].quantile(0.75)
     betweenness_bottom = df_class['betweenness'].quantile(0.25)
     
     degree_top = df_class['degree'].quantile(0.75)
     degree_bottom = df_class['degree'].quantile(0.25)
     
-    # 4. Define classification masks based on the dual conditions
-    # Condition for Class 1: both betweenness and degree must be at or above the 75th percentile
+    # 4. Define classification masks
     mask_class1 = (df_class['betweenness'] >= betweenness_top) & \
                   (df_class['degree'] >= degree_top)
                   
-    # Condition for Class 2: both betweenness and degree must be at or below the 25th percentile
     mask_class2 = (df_class['betweenness'] <= betweenness_bottom) & \
                   (df_class['degree'] <= degree_bottom)
                   
     # 5. Filter data and assign classes
-    # First, only keep rows that satisfy either class condition
     df_filtered = df_class[mask_class1 | mask_class2].copy()
     
-    # Then, assign class labels on the filtered data
-    # If an edge's betweenness is above the high threshold, it must be Class 0 (because we have already filtered)
     df_filtered['class'] = np.where(
         df_filtered['betweenness'] >= betweenness_top,
-        0,  # Assign as Class 1
-        1   # Otherwise, assign as Class 2
+        0,
+        1
     )
     
     return df_filtered
@@ -72,27 +74,40 @@ def Classifying(df):
 # Select edges for KS test
 def KS_Data_Preprocessing(df):
     np.random.seed(423) 
+
+    grouped = df.groupby('class')
     
-    class_data = defaultdict(lambda: {'edges': [], 'flows': []})
-    for _, row in df.iterrows():
-        cls = row['class']
-        edge = (row['node1'], row['node2'])
-        class_data[cls]['edges'].append(edge)
-        class_data[cls]['flows'].append(row['flow'])
+    edges_by_class = {
+        0: grouped.get_group(0)[['node1', 'node2']].to_numpy(),
+        1: grouped.get_group(1)[['node1', 'node2']].to_numpy()
+    }
+    flows_by_class = {
+        0: grouped.get_group(0)['flow'].to_numpy(),
+        1: grouped.get_group(1)['flow'].to_numpy()
+    }
+
+    node_to_edge_map = defaultdict(list)
+    for cls in [0, 1]:
+        for i, (u, v) in enumerate(edges_by_class[cls]):
+            node_to_edge_map[u].append((cls, i))
+            node_to_edge_map[v].append((cls, i))
+
+    is_edge_available = {
+        0: np.ones(len(edges_by_class[0]), dtype=bool),
+        1: np.ones(len(edges_by_class[1]), dtype=bool)
+    }
     
-    result = {0: [], 1: []} 
+    remain_counts = {
+        0: len(edges_by_class[0]),
+        1: len(edges_by_class[1])
+    }
+    
     used_nodes = set()
-    
+    result = {0: [], 1: []}
+
     while True:
-        available = {
-            0: [i for i, e in enumerate(class_data[0]['edges']) 
-                if e[0] not in used_nodes and e[1] not in used_nodes],
-            1: [i for i, e in enumerate(class_data[1]['edges']) 
-                if e[0] not in used_nodes and e[1] not in used_nodes]
-        }
-        
-        remain_0 = len(available[0])
-        remain_1 = len(available[1])
+        remain_0 = remain_counts[0]
+        remain_1 = remain_counts[1]
         
         if remain_0 + remain_1 == 0:
             break
@@ -103,30 +118,41 @@ def KS_Data_Preprocessing(df):
             target_cls = 1
         else:
             target_cls = 0 if remain_0 > 0 else 1
+            
+        alt_cls = 1 - target_cls
         
-        success = False
-        np.random.shuffle(available[target_cls])  
-        
-        for idx in available[target_cls]:
-            u, v = class_data[target_cls]['edges'][idx]
-            if u not in used_nodes and v not in used_nodes:
-                result[target_cls].append(class_data[target_cls]['flows'][idx])
-                used_nodes.update([u, v])
-                success = True
-                break
+        def find_and_process_edge(cls_to_process):
+            available_indices = [i for i, is_avail in enumerate(is_edge_available[cls_to_process]) if is_avail]
+            
+            if not available_indices:
+                return False
+            
+            np.random.shuffle(available_indices)
+            
+            for edge_idx in available_indices:
+                u, v = edges_by_class[cls_to_process][edge_idx]
                 
-        if not success:
-            alt_cls = 1 if target_cls == 0 else 0
-            for idx in available[alt_cls]:
-                u, v = class_data[alt_cls]['edges'][idx]
                 if u not in used_nodes and v not in used_nodes:
-                    result[alt_cls].append(class_data[alt_cls]['flows'][idx])
+                    result[cls_to_process].append(flows_by_class[cls_to_process][edge_idx])
                     used_nodes.update([u, v])
-                    success = True
-                    break
-            if not success:
-                break  
+                    
+                    for node in [u, v]:
+                        if node in node_to_edge_map:
+                            for conn_cls, conn_idx in node_to_edge_map[node]:
+                                if is_edge_available[conn_cls][conn_idx]:
+                                    is_edge_available[conn_cls][conn_idx] = False
+                                    remain_counts[conn_cls] -= 1
+                    return True
+            
+            return False
 
+        success = find_and_process_edge(target_cls)
+        if not success:
+            success = find_and_process_edge(alt_cls)
+            
+        if not success:
+            break
+            
     df_class0_KS = pd.DataFrame({'flow': [abs(f) for f in result[0]]})
     df_class1_KS = pd.DataFrame({'flow': [abs(f) for f in result[1]]})
     return df_class0_KS, df_class1_KS
