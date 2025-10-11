@@ -1,7 +1,6 @@
 "*.log" 
 "*.tmp"
-EFHT_Analysis/results/
 **/.DS_Store
-EFHT_Analysis/plot.ipynb
 __pycache__/
-EFHT_Analysis/data/
+results/synthetic/
+data/synthetic/
