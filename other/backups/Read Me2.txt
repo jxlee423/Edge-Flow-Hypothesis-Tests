@@ -1,0 +1,27 @@
+Go to: https://drive.google.com/drive/u/1/folders/17yOVIKQpi58Wq75Z-FTUvaxPUQMyhAVF
+
+Here are a sample of the output you can generate with the sampling code. Larger files were too heavy to put on GitHub (I am trying to compress now).
+
+The .mat files open into structs. Each struct is, in essence, a file system.
+
+The file structure is:
+
+Examples.<random graph family>: "Erdos", "Small_World", or "Scale_Free"
+
+Examples.<random graph family>.<...>: "input_parameters", "Graph_Settings", "Cov_Settings", "Graphs", "Flows", "Effect_Sizes"
+
+I've chosen not too flatten these down to one massive csv since the same graph settings are shared by many examples, as are covariance settings, random graphs, etc, so it is more space efficient to save a large cell array of sample flows, then provide look-up tables to relate a specific flow to a) the random graph settings, b) the particular random graph, c) the chosen covariance satisfying our hypothesis, d) the parameters for the iterative procedure used to violate our hypothesis. The indices for the flow array correspond to these choices. 
+
+Flows are stored as a cell array Flows{i,j,k,l}: fixing i, j, k, l fixes a random graph family (i), particular sample graph topology (j), correlation for the true hypothesis (k), parameters for violations of the hypothesis (l)
+
+* "input_parameters" is purely for replication. Only open this if you want to copy the parameters struct, then pass it as the input the sampling code to replicate the experiment
+
+* "Graph_Settings" contains the parameter ranges for the random graph combinations searched over. These are in a multi-dimensional array. To match to the first index of the flow cell array, call as a single index. i.e. ...Graph_Settings.Ns(i) would recover the size of the graph set for all flows with first index i.
+
+* "Cov_Settings" like graph settings, but for the covariance parameters. These are stored in arrays whose first index is (k) (choice of correlation), and second is (l) (violation parameters). The .null_is_true array is an indicator for whether a particular example satisfies the null. Notice that, this only depends on whether the violation procedure is applied, so is only dependent on the last index, (l).
+
+* "Graphs" stores the samples graphs. index (i) is the random graph parameters, (j) is the particular sample. ...Graphs.valid(i,j) is an indicator for whether the sampling procedure produced a connected graph. Graphs.edge_to_endpoints{i,j} is a E by 2 array, where each row is an edge, and the columns indicate endpoints, for the j^th sample from the i^th random graph model.
+
+* "Flows", cell array indexed by {i,j,k,l}. If you fix {i,j,k,l} you will get an E by n array, where each row is an edge, each column is a repetition (new sample from the same model with random graph family i, sample topology j, correlation k, and violation rules l). Entries are the flow on a particular edge, for a particular sample.
+
+* "Effect_sizes" is an array whose first index is k (choice of correlation), second is l (violation rules), and third index corresponds to the constraint condition checked (1 = diagonals share the same variance, 2 = disjoint edges have zero covariance, 3 = neighboring edges all share the same correlation). Effect size is found by finding the covariance in our family with the best fit parameters, where fit is measured by maximum absolute discrepancy across all entries. The division into three effect sizes is performed by finding the maximum discrepancy among any of the sets (diagonals, off diagonal disjoint, diagonal neighboring). When the graphs are large (E > 1000), the effect sizes are estimated by using the top 1000 by 1000 minor of the flow covariance.

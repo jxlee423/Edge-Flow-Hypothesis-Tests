@@ -1,0 +1,8 @@
+testAll takes in
+  a matrix of subgraph_flows, where each column corresponds to an edge class,
+  a subgraph, where a 1 represents connected edges, and a 0 represents disjoint edges,
+  and an alpha value.
+and outputs whether or not the result of the test is fail to reject the null.
+testAll relies on the functions, test1, test2, and test3, which in turn rely on the function slope_ci
+Note that subgraph_flows needs to be computed outside of the testAll function. This should be done with existing code that is in the Latest_Code folder, outside of the Other_perform_test folder.
+  
