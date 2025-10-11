@@ -29,6 +29,8 @@ The repository is organized into the following main directories:
       * `plotting.py`: Python script with utility functions for generating plots.
 
   * **`plots/`**: Stores the output figures generated from the analyses.
+  
+  * **`results/`**: Stores all testing results. (has been put in `.gitignore`)
 
   * **`other/`**: Contains supplementary materials, including older versions of methods, backups.
 
