@@ -1,0 +1,11 @@
+Sampler Code Guide:
+
+Use the code in this folder to generate synthetic samplers. The code is pretty efficient. It can easily generate many graphs from any of the three families with up to 10^4 nodes and 10^5 edges. For reasonable default ranges, look at the presets in "Flow_Examples."
+
+To run:
+
+1. "Flow_Examples" this is a script which, when run, calls the sampler. Use this script to store parameter range settings and to save results to a file.
+
+2. "Random_Flow_Sampler" this is the function that performs the sampling. It structures the parameter sets to test, calls a graph sampler, then passes those graphs to a flow sampler.
+
+The rest are specific random graph samplers. 
