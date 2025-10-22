@@ -92,6 +92,10 @@ def add_plot_features(df):
     if df['setting'].str.contains('_D').any():
         df['averaging distance'] = df['setting'].str.extract(r'_D(\d+)_').astype(float)
 
+    # Attempt to extract Averaging Weight
+    if df['setting'].str.contains('_W').any():
+        df['W'] = df['setting'].str.extract(r'_W([\d.]+)_').astype(float)
+
     # Extract NodeCount
     def convert_k_to_numeric(node_str):
         if isinstance(node_str, str):
