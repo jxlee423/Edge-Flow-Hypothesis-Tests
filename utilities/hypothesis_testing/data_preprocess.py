@@ -6,9 +6,67 @@ import graph_tool.all as gt
 from tqdm import tqdm
 from joblib import Parallel, delayed
 from collections import defaultdict
+from sklearn.mixture import GaussianMixture
+from scipy.sparse import csr_matrix
 
-# Preliminary classification
-def Classifying(df):
+# Preliminary classification for StocastcBlock
+def Classifying_SB(df):
+    """
+    Classifies edges based on "sum of degrees".
+    - Class 0: Edges where sum of degrees is in the top 20%.
+    - Class 1: Edges where sum of degrees is in the bottom 20%.
+    Uses graph-tool
+    """
+    df_class = df.copy()
+    
+    # 1. Preprocessing: ensure node1 < node2
+    for index, row in df_class.iterrows():
+        u, v = row["node1"], row["node2"]
+        if u > v:
+            df_class.at[index, "node1"] = v
+            df_class.at[index, "node2"] = u
+            
+    # 2. Create graph and calculate the two core metrics
+
+    g = gt.Graph(directed=False)
+    g.vp.ids = g.add_edge_list(df_class[['node1', 'node2']].values, 
+                                hashed=True, 
+                                hash_type='int64_t')
+
+    # --- Metric 1: Sum of Degrees ---
+    deg = g.degree_property_map("total")
+    
+    node_degrees_dict = {g.vp.ids[v]: deg[v] for v in g.vertices()}
+    
+    degree1 = df_class['node1'].map(node_degrees_dict)
+    degree2 = df_class['node2'].map(node_degrees_dict)
+    df_class['degree'] = degree1 + degree2
+
+    print("Metrics calculated.")
+    
+    # 3. Determine thresholds
+ 
+    degree_top = df_class['degree'].quantile(0.80)
+    degree_bottom = df_class['degree'].quantile(0.20)
+    
+    # 4. Define classification masks
+    mask_class1 = (df_class['degree'] >= degree_top)
+                  
+    mask_class2 = (df_class['degree'] <= degree_bottom)
+                  
+    # 5. Filter data and assign classes
+    df_filtered = df_class[mask_class1 | mask_class2].copy()
+    
+    df_filtered['class'] = np.where(
+        df_filtered['degree'] >= degree_top,
+        0,
+        1
+    )
+    
+    return df_filtered
+
+# Preliminary classification for SmallWorld
+def Classifying_SW(df):
     """
     Classifies edges based on two metrics: "edge betweenness" and "sum of degrees".
     - Class 1: Edges where both edge betweenness and sum of degrees are in the top 25%.
@@ -160,14 +218,17 @@ def KS_Data_Preprocessing(df):
 # Select edge pairs for Bivariate Test
 def BEDT_Data_Preprocessing(df,dfall):
     np.random.seed(423) 
+
+    df_data = df.to_dict('index')
+
     edge_info = {}
     class_edges = defaultdict(list)
     node_map = defaultdict(set)
     
-    for idx, row in df.iterrows():
-        u, v = sorted([row['node1'], row['node2']])
+    for idx, row_data in df_data.items():
+        u, v = sorted([row_data['node1'], row_data['node2']])
         edge_info[idx] = (u, v)
-        cls = row['class']
+        cls = row_data['class']
         class_edges[cls].append(idx)
         node_map[u].add(idx)
         node_map[v].add(idx)
@@ -184,7 +245,7 @@ def BEDT_Data_Preprocessing(df,dfall):
             u1, v1 = edge_info[e1]
             connected = node_map[u1].union(node_map[v1])
             for e2 in connected:
-                if e2 <= e1 or df.loc[e2, 'class'] != cls:
+                if e2 <= e1 or df_data[e2]['class'] != cls:
                     continue
                 u2, v2 = edge_info[e2]
                 if {u1, v1}.isdisjoint({u2, v2}):
@@ -242,8 +303,8 @@ def BEDT_Data_Preprocessing(df,dfall):
             u2, v2 = edge_info[e2]
             shared = (set([u1, v1]) & set([u2, v2])).pop()
             
-            flow1 = df.loc[e1, 'flow']
-            flow2 = df.loc[e2, 'flow']
+            flow1 = df_data[e1]['flow']
+            flow2 = df_data[e2]['flow']
             if shared == u1:
                 flow1 *= -1
             if shared == v2:
@@ -269,27 +330,32 @@ def BEDT_Data_Preprocessing(df,dfall):
     class0 = [item for item in selected if item['class'] == 0]
     class1 = [item for item in selected if item['class'] == 1]
 
+    dfall_data = dfall.to_dict('index')
     edge_info_all = {}
     node_map_all = defaultdict(set)
-    
-    for idx, row in dfall.iterrows():
-        u, v = sorted([row['node1'], row['node2']])
+
+    for idx, row_data in dfall_data.items():
+        u, v = sorted([row_data['node1'], row_data['node2']])
         edge_info_all[idx] = (u, v)
         node_map_all[u].add(idx)
         node_map_all[v].add(idx)
     
     # 2. Generate all_candidates from dfall
     all_candidates = []
-    for i in range(len(dfall.index)):
-        u1, v1 = edge_info_all[i]
-        connected = node_map_all[u1].union(node_map_all[v1])
-        for e2 in connected:
-            if e2 <= i: 
-                continue
-            u2, v2 = edge_info_all[e2]
-            if {u1, v1}.isdisjoint({u2, v2}): 
-                continue
-            all_candidates.append(tuple(sorted((i, e2))))
+
+    dfall_indices = list(dfall_data.keys())
+
+    for i_idx in range(len(dfall_indices)):
+            i = dfall_indices[i_idx]
+            u1, v1 = edge_info_all[i]
+            connected = node_map_all[u1].union(node_map_all[v1])
+            for e2 in connected:
+                if e2 <= i: 
+                    continue
+                u2, v2 = edge_info_all[e2]
+                if {u1, v1}.isdisjoint({u2, v2}): 
+                    continue
+                all_candidates.append(tuple(sorted((i, e2))))
     
     # 3. Sort and process global candidates with dfall
     all_candidates.sort(key=lambda x: -len(set(edge_info_all[x[0]] + edge_info_all[x[1]])))
@@ -308,9 +374,9 @@ def BEDT_Data_Preprocessing(df,dfall):
             u2, v2 = edge_info_all[e2]
             shared = (set([u1, v1]) & set([u2, v2])).pop()
             
-            flow1 = dfall.loc[e1, 'flow']
-            flow2 = dfall.loc[e2, 'flow']
-            
+            flow1 = dfall_data[e1]['flow']
+            flow2 = dfall_data[e2]['flow']
+
             if shared == u1: flow1 *= -1
             if shared == v2: flow2 *= -1
             
@@ -339,12 +405,10 @@ def Coloring(df, jobs=-1):
     """
     df_colored = df.copy()
     # Ensure node1 < node2, and adjust flow direction accordingly
-    for index, row in df_colored.iterrows():
-        u, v = row["node1"], row["node2"]
-        if u > v:
-            df_colored.at[index, "node1"] = v
-            df_colored.at[index, "node2"] = u
-            df_colored.at[index, "flow"] *= -1
+    swap_mask = df_colored["node1"] > df_colored["node2"]
+    df_colored.loc[swap_mask, ['node1', 'node2']] = \
+        df_colored.loc[swap_mask, ['node2', 'node1']].values
+    df_colored.loc[swap_mask, "flow"] *= -1
 
     def _edge_coloring(edges):
         """Internal function: executes Vizing's theorem based edge coloring algorithm."""
@@ -353,7 +417,7 @@ def Coloring(df, jobs=-1):
             vertices.update({u, v})
         
         if not vertices:
-            return {}, 0
+            return {}
 
         degree = {v: 0 for v in vertices}
         for u, v in edges:
@@ -369,7 +433,7 @@ def Coloring(df, jobs=-1):
                 continue
                 
             forbidden = used_colors[u].union(used_colors[v])
-            for color in range(max_degree + 1):
+            for color in range(max_degree*2 + 1):
                 if color not in forbidden:
                     color_map[(u, v)] = color
                     used_colors[u].add(color)
@@ -383,24 +447,28 @@ def Coloring(df, jobs=-1):
     if not color_map:
         return pd.DataFrame()
         
-    df_colored["color"] = df_colored.apply(
-        lambda r: color_map.get(tuple(sorted((r["node1"], r["node2"]))), -1), axis=1)
+    color_series = pd.Series(color_map)
+    color_series.index = pd.MultiIndex.from_tuples(color_series.index)
+    df_index = pd.MultiIndex.from_frame(df_colored[['node1', 'node2']])
+    
+    df_colored['color'] = df_index.map(color_series).fillna(-1).astype(int)
+
+    df_colored = df_colored[df_colored['color'] != -1].copy()
 
     original_G = nx.from_pandas_edgelist(
         df_colored, "node1", "node2", ["flow", "color"], create_using=nx.Graph()
     )
 
-    def process_color(color):
+    all_pairs_sp = dict(nx.all_pairs_shortest_path_length(original_G))
+    
+    def process_color(color, G, all_pairs_sp):
         """Internal function: pairing within each color group."""
-        G = copy.deepcopy(original_G)
         all_edges_in_color = [(u, v) for u, v, attr in G.edges(data=True) if attr.get("color") == color]
         target_edges = sorted([tuple(sorted(edge)) for edge in all_edges_in_color])
         
         total_edges = len(target_edges)  
         if total_edges < 2:
             return []
-
-        all_pairs_sp = dict(nx.all_pairs_shortest_path_length(G))
 
         edge_distances = []
         for i in range(len(target_edges)):
@@ -432,10 +500,16 @@ def Coloring(df, jobs=-1):
                 used_edges.update({e1, e2})
         return color_pairs
 
-    all_colors = df_colored["color"].unique()
+    color_counts = df_colored["color"].value_counts()
+
+    top_5_colors = color_counts.nlargest(5).index.tolist()
+    
+    print(f"Identified top 5 colors: {top_5_colors}")
+    print(f"Edge counts for top 5: {color_counts.nlargest(5).to_dict()}")
+
     results = Parallel(n_jobs=jobs, prefer="processes")(
-        delayed(process_color)(color)
-        for color in tqdm(sorted(all_colors), desc="Processing Colors")
+        delayed(process_color)(color, original_G, all_pairs_sp)
+        for color in tqdm(sorted(top_5_colors), desc="Processing Top 5 Colors")
     )
     
     all_flow_pairs = pd.DataFrame([item for sublist in results for item in sublist])
