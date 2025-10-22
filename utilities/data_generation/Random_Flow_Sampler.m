@@ -191,19 +191,23 @@ elseif strcmp(parameters.graph_mode,'Scale Free') % standard random graph family
         end
     end
 
-elseif strcmp(parameters.graph_mode,'Block Stochastic') % community structure, clustered spectrum?
+elseif strcmp(parameters.graph_mode,'Stochastic Block') % community structure, clustered spectrum?
     % parameters
     if parameters.default_ranges == 1
-        parameters.n_communities = 5;% number of communities
-        parameters.expected_community_sizes = 80; % expected community sizes
-        parameters.p_intras = 0.975; % within community connection p
-        parameters.p_inters = 0.025; % across community connection p
+        parameters.n_communities = 3;% number of communities
+        parameters.Ns = 1000; % expected community sizes
+        parameters.a = 10; % internal degree
+        parameters.b = 1; % external degree
     end
+    
+    [parameter_grid.a, parameter_grid.b, parameter_grid.n_communities, parameter_grid.Ns] = ...
+        ndgrid(parameters.a, parameters.b, parameters.n_communities, parameters.Ns);
+    
+    parameter_grid.size = [length(parameters.a), length(parameters.b), ...
+        length(parameters.n_communities), length(parameters.Ns)];
 
-    [parameter_grid.p_intras,parameter_grid.p_inters,parameter_grid.n_communities,parameter_grid.expected_community_sizes] =...
-        ndgrid(parameters.p_intras,parameters.p_inters,parameters.n_communities,parameters.expected_community_sizes);
-    parameter_grid.size = [length(parameters.p_inters),length(parameters.p_intras),...
-        length(parameters.n_communities),length(parameters.expected_community_sizes)];
+    parameter_grid.p_intras = zeros(size(parameter_grid.a));
+    parameter_grid.p_inters = zeros(size(parameter_grid.a));
 
     % sample
     for i = 1:prod(parameter_grid.size)
@@ -212,15 +216,24 @@ elseif strcmp(parameters.graph_mode,'Block Stochastic') % community structure, c
 
         %% get parameters
         n_communities = parameter_grid.n_communities(i);
-        community_size_list = round(2*parameter_grid.expected_community_sizes(i)*rand(1,parameters.n_communities));
-        p_inter = parameter_grid.p_inters(i);
-        p_intra = parameter_grid.p_intras(i);
+        N = parameter_grid.Ns(i);
+
+        a_current = parameter_grid.a(i);
+        b_current = parameter_grid.b(i);
+
+        p_intra = (a_current * n_communities) / N;
+        p_inter = (b_current * n_communities) / (N * (n_communities - 1));
+
+        % 1. For each of the N nodes, assign a community label.
+        node_assignments = randi(n_communities, 1, N);
+        % 2. Count the final size of each community.
+        community_size_list = histcounts(node_assignments, 1:(n_communities+1));
 
         P = (p_intra - p_inter)*eye(n_communities,n_communities) + p_inter*ones(n_communities,n_communities); % block connection probabilities
 
         for k = 1:n_real.graph
             Graphs.valid(i,k) = 1;
-            [Graphs.edge_to_endpoints{i,k},classes{i}] = stochastic_block_sampler(community_size_list,P);
+            [Graphs.edge_to_endpoints{i,k}, Graphs.ground_truth_communities{i,k}] = stochastic_block_sampler(community_size_list,P);
         end
     end
 

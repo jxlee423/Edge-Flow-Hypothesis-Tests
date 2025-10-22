@@ -4,42 +4,61 @@
 clear
 clc
 
-% --- Define the grid of parameters to iterate over ---
-% Format: {'field.name.in.parameters.struct', [array of values]}
+% --- 1. Choose graph model ---
+% Options: 'Small World' or 'Stochastic Block'
+% parameters.graph_mode = 'Small World'; 
+parameters.graph_mode = 'Stochastic Block'; 
 
-grid_parameters = {
-    'Ns', [1000, 2000, 4000, 8000, 16000];
-    'cov.averaging_weights', [0, 0.1, 0.2, 0.3, 0.4]
-};
-
-% !!! Remember to commment parameters you already put in the grid parameters.
-
-% --- Set Fixed Parameters that are the same for all runs ---
+% --- 2. SHARED Fixed Parameters (Same for all models) ---
 % distribution
 parameters.distribution = 'Gaussian';
 
-% covariance models
+% cov
 parameters.cov.rhos = 0.5;
 parameters.cov.correlation_ds = 5;
-% parameters.cov.averaging_weights = 0.4;
+parameters.cov.averaging_weights = 0.5; 
 parameters.cov.averaging_signs = 1;
 
-%% Graph Settings
-
-% Small World graph parameters
-parameters.graph_mode = 'Small World';
-parameters.default_ranges = 0;
-% parameters.Ns = 1000; % size
-parameters.Ks = 13; % mean node degree/2, or E = K*N
-parameters.betas = 0.7; % rewiring probability
-
-
+% sample
 parameters.n_real.graph = 1;
 parameters.n_real.flow = 50;
 
-% Please set the number for the 'G' part of the filename yourself.
-% For example, if you already have a G1 and want to create G2, set this to 2.
+% Manual Graph ID (e.g., 'G1', 'G2')
 manual_graph_id = 1;
+
+
+% --- 3. MODEL-SPECIFIC Configuration (Grid & Fixed Params) ---
+fprintf('Configuring batch for: %s\n', parameters.graph_mode);
+
+if strcmp(parameters.graph_mode, 'Small World')
+
+    % --- Define the grid of parameters to iterate over ---
+    grid_parameters = {
+        'Ns', [1000, 2000, 4000, 8000, 16000];
+        'cov.rhos', [0, 0.1, 0.2, 0.3, 0.4, 0.5];
+    };
+    
+    % --- Set Fixed Parameters for Small World ---
+    parameters.default_ranges = 0;
+    parameters.Ks = 13; % mean node degree/2
+    parameters.betas = 0.7; % rewiring probability
+    
+elseif strcmp(parameters.graph_mode, 'Stochastic Block') 
+    % --- Define the grid of parameters to iterate over ---
+    grid_parameters = {
+        'Ns', [16000, 32000, 64000, 128000];
+        'a', [5, 10, 15, 20, 25];
+    };
+
+    % --- Set Fixed Parameters for Stochastic Block ---
+    parameters.default_ranges = 0;
+    % parameters.a = 15;
+    parameters.b = 1;
+    parameters.n_communities = 3;
+    
+else
+    error('Invalid GRAPH_MODEL_TO_RUN. Check STEP 1. Must be ''Small World'' or ''Stochastic Block''.');
+end
 
 %% =================================================================
 %  STEP 2: AUTOMATIC EXECUTION (No modification needed below)

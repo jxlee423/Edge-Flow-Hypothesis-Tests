@@ -12,6 +12,8 @@ function single_run_synthetic_data_generator(parameters)
     switch parameters.graph_mode
         case 'Small World'
             graph_params_str = sprintf('Beta%.1f_K%d', parameters.betas, parameters.Ks);
+        case 'Stochastic Block'
+            graph_params_str = sprintf('Nc%d_A%.d_B%.d', parameters.n_communities, parameters.a, parameters.b);
         otherwise
             graph_params_str = 'UnknownParams';
     end
