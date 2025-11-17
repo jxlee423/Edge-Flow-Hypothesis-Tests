@@ -478,7 +478,7 @@ for i = 1:n_graph_params
                         % perturb
                         Flows{i,k,j,l} = sqrt(rho)*flow + sqrt(1 - 2*rho)*randn(E,parameters.n_real.flow); % has covariance (1 - 2 rho) I + rho G*G'= I + rho A_edge
                         % average
-                        if cov_dist - 1 > 1
+                        if cov_dist - 1 >= 1
                             for products = 1:cov_dist - 1
                                 Flows{i,k,j,l} = (1 - cov_averaging_weight)*Flows{i,k,j,l} + cov_averaging_weight*av_sign*sparse((1:E),(1:E),1./edge_degrees,E,E)*(A_edge*Flows{i,k,j,l});
                             end
