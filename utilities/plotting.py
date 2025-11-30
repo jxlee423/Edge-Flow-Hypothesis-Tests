@@ -96,6 +96,14 @@ def add_plot_features(df):
     if df['setting'].str.contains('_W').any():
         df['W'] = df['setting'].str.extract(r'_W([\d.]+)_').astype(float)
 
+    # Attempt to extract A
+    if df['setting'].str.contains('_A').any():
+        df['A'] = df['setting'].str.extract(r'_A([\d.]+)_').astype(float)
+
+    # Attempt to extract Nc
+    if df['setting'].str.contains('-Nc').any():
+        df['Nc'] = df['setting'].str.extract(r'-Nc([\d.]+)_').astype(float)
+
     # Extract NodeCount
     def convert_k_to_numeric(node_str):
         if isinstance(node_str, str):
