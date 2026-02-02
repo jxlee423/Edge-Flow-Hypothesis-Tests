@@ -5,9 +5,10 @@ clear
 clc
 
 % --- 1. Choose graph model ---
-% Options: 'Small World' or 'Stochastic Block'
+% Options: 'Small World', 'Stochastic Block', or 'Scale Free'
 % parameters.graph_mode = 'Small World'; 
-parameters.graph_mode = 'Stochastic Block'; 
+% parameters.graph_mode = 'Stochastic Block';
+parameters.graph_mode = 'Scale Free';
 
 % --- 2. SHARED Fixed Parameters (Same for all models) ---
 % distribution
@@ -46,18 +47,30 @@ if strcmp(parameters.graph_mode, 'Small World')
 elseif strcmp(parameters.graph_mode, 'Stochastic Block') 
     % --- Define the grid of parameters to iterate over ---
     grid_parameters = {
-        'Ns', [16000, 32000, 64000, 128000];
-        'a', [5, 10, 15, 20, 25];
+        'Ns', [64000, 128000];
+        'cov.averaging_weights', [0,0.1,0.2,0.3,0.4];
     };
 
     % --- Set Fixed Parameters for Stochastic Block ---
     parameters.default_ranges = 0;
-    % parameters.a = 15;
+    parameters.a = 15;
     parameters.b = 1;
     parameters.n_communities = 3;
+elseif strcmp(parameters.graph_mode, 'Scale Free')
+    % --- Define the grid of parameters to iterate over ---
+    grid_parameters = {
+        'Ns', [500, 1000, 2000, 4000, 8000, 16000];
+        'gammas', [2.3, 2.5, 2.7, 2.9];
+    };
+    
+    % --- Set Fixed Parameters for Scale Free ---
+    parameters.default_ranges = 0;
+    parameters.d_mins = 4;
+    parameters.debug_scalefree = false;
+    parameters.python_path = '"/Users/jiaxin/Documents/Summer 2024/EFHT/Edge-Flow-Hypothesis-Tests/.conda/bin/python3"'; % please change it to your own path
     
 else
-    error('Invalid GRAPH_MODEL_TO_RUN. Check STEP 1. Must be ''Small World'' or ''Stochastic Block''.');
+    error('Invalid GRAPH_MODEL_TO_RUN. Check STEP 1. Must be ''Small World'', ''Stochastic Block'', or ''Scale Free''.');
 end
 
 %% =================================================================

@@ -14,6 +14,8 @@ function single_run_synthetic_data_generator(parameters)
             graph_params_str = sprintf('Beta%.1f_K%d', parameters.betas, parameters.Ks);
         case 'Stochastic Block'
             graph_params_str = sprintf('Nc%d_A%.d_B%.d', parameters.n_communities, parameters.a, parameters.b);
+        case 'Scale Free'
+            graph_params_str = sprintf('Gamma%.1f_Dmin%d', parameters.gammas, parameters.d_mins);
         otherwise
             graph_params_str = 'UnknownParams';
     end
