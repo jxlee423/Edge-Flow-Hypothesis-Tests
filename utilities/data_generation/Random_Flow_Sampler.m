@@ -173,6 +173,8 @@ elseif strcmp(parameters.graph_mode,'Scale Free') % standard random graph family
         N = parameter_grid.Ns(i);
         d_min = parameter_grid.d_mins(i);
         gamma = parameter_grid.gammas(i);
+        debug_scalefree = parameters.debug_scalefree;
+        python_path = parameters.python_path;
 
         degree_dist = (1:N-1).^(-gamma); % ~ Pareto
         degree_dist(1:d_min-1) = 0;
@@ -181,7 +183,7 @@ elseif strcmp(parameters.graph_mode,'Scale Free') % standard random graph family
         if d_min <= N-1
             for k = 1:n_real.graph
                 Graphs.valid(i,k) = 1;
-                [Graphs.edge_to_endpoints{i,k},~] = fixed_degree_distribution_sampler(N,degree_dist);
+                [Graphs.edge_to_endpoints{i,k},~] = degree_distribution_sampler(N,degree_dist,debug_scalefree,python_path);
             end
         else
             for k = 1:n_real.graph
@@ -416,41 +418,44 @@ for i = 1:n_graph_params
             %% build gradient
             G = sparse((1:E),edge_to_endpoints(:,1),1,E,V) - sparse((1:E),edge_to_endpoints(:,2),1,E,V);
 
-            %% build Laplacian
-            Laplacian = G*G';
-
-            %% build edge adjacency
-            A_edge = Laplacian - 2*speye(E,E);
+            % %% build Laplacian
+            % Laplacian = G*G';
+            % 
+            % %% build edge adjacency
+            % A_edge = Laplacian - 2*speye(E,E);
 
             %% loop over rhos
             for j = 1:n_rhos
                 fprintf('\n       Generating flows for correlation %d of %d',j,n_rhos)
                 rho = parameters.cov.rhos(j);
-
-                %% build initial covariance
-                Cov_0 = speye(E,E) + rho*A_edge;
-
+                
                 %% loop over averaging parameter grid
                 for l = 1:n_averaging_params
                     % fprintf('\n          Generating flows for perturbation %d of %d',l,n_averaging_params)
                     cov_dist = cov_ds_grid(l);
                     cov_averaging_weight = cov_averaging_grid(l);
                     av_sign = cov_signs_grid(l);
-
-                    %% compute edge degrees
-                    edge_degrees = sum(abs(A_edge));
-
+                    
                     %% compute covariance after the iterated averaging procedure
                     if E < 500
+                        % compute Laplacian and edge adjacency
+                        Laplacian = G*G';
+                        A_edge = Laplacian - 2*speye(E,E);
+
+                        %% build initial covariance
+                        Cov_0 = speye(E,E) + rho*A_edge;
+
+                        %% compute edge degrees
+                        edge_degrees = sum(abs(A_edge));
+                        
                         Averaging_M = ((1 - cov_averaging_weight)*speye(E,E) + cov_averaging_weight*diag(1./edge_degrees)*av_sign*A_edge)^(cov_dist - 1);
                         Cov = Averaging_M*Cov_0*Averaging_M';
-
                         %% decompose
                         R = cholcov(Cov); % returns R such that R*R' = Cov
                         R = R';
                         [~, rank_of_Cov] = size(R);
-
-                        %% sample
+                        
+                        % sample 
                         if strcmp(parameters.distribution,'Gaussian')
                             Flows{i,k,j,l} = R*randn(rank_of_Cov,parameters.n_real.flow);
                         elseif strcmp(parameters.distribution,'Laplace')
@@ -460,7 +465,15 @@ for i = 1:n_graph_params
                         elseif strcmp(parameters.distribution,'Uniform')
                             Flows{i,k,j,l} = sqrt(3)*R*(2*rand(rank_of_Cov,parameters.n_real.flow) - 1);
                         end
+                        
                     else
+                        %% compute edge degrees
+                        node_degrees = full(sum(abs(G), 1));
+                        u_indices = edge_to_endpoints(:,1);
+                        v_indices = edge_to_endpoints(:,2);
+                        edge_degrees = node_degrees(u_indices) + node_degrees(v_indices) - 2;
+                        edge_degrees = edge_degrees(:).'; 
+                        
                         % sample potentials
                         if strcmp(parameters.distribution,'Gaussian')
                             U = randn(V,parameters.n_real.flow);
@@ -480,11 +493,14 @@ for i = 1:n_graph_params
                         % average
                         if cov_dist - 1 >= 1
                             for products = 1:cov_dist - 1
-                                Flows{i,k,j,l} = (1 - cov_averaging_weight)*Flows{i,k,j,l} + cov_averaging_weight*av_sign*sparse((1:E),(1:E),1./edge_degrees,E,E)*(A_edge*Flows{i,k,j,l});
+                                % implicit A_edge multiplication
+                                x = Flows{i,k,j,l};
+                                Ax = G * (G' * x) - 2 * x;
+                                Flows{i,k,j,l} = (1 - cov_averaging_weight)*x + cov_averaging_weight*av_sign*bsxfun(@times, Ax, (1./edge_degrees)');
                             end
                         end
                     end
-
+                    
                     %% store settings
                     if cov_dist <= 1 || cov_averaging_weight == 0
                         Cov_settings.null_is_true(l) = 1;
