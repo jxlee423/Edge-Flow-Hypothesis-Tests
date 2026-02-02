@@ -59,13 +59,13 @@ elseif strcmp(parameters.graph_mode, 'Stochastic Block')
 elseif strcmp(parameters.graph_mode, 'Scale Free')
     % --- Define the grid of parameters to iterate over ---
     grid_parameters = {
-        'Ns', [500, 1000, 2000, 4000, 8000, 16000];
-        'gammas', [2.3, 2.5, 2.7, 2.9];
+        'Ns', [250, 500, 1000, 2000, 4000, 8000, 16000];
+        'd_mins', [2, 6, 8, 10];
     };
     
     % --- Set Fixed Parameters for Scale Free ---
     parameters.default_ranges = 0;
-    parameters.d_mins = 4;
+    parameters.gammas = 2.3;
     parameters.debug_scalefree = false;
     parameters.python_path = '"/Users/jiaxin/Documents/Summer 2024/EFHT/Edge-Flow-Hypothesis-Tests/.conda/bin/python3"'; % please change it to your own path
     

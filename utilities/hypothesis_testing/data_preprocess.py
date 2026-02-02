@@ -26,128 +26,128 @@ def standardize_graph_data(df):
     return df
 
 # Preliminary classification for ScaleFree
-def Classifying_SF(df):
-    """
-    Classifies edges based on "sum of degrees".
-    - Class 0: Edges where sum of degrees is in the top 20%.
-    - Class 1: Edges where sum of degrees is in the bottom 20%.
-    Uses graph-tool
-    """
-    df_class = df.copy()
-    
-    # 1. Preprocessing: ensure node1 < node2
-    for index, row in df_class.iterrows():
-        u, v = row["node1"], row["node2"]
-        if u > v:
-            df_class.at[index, "node1"] = v
-            df_class.at[index, "node2"] = u
-            
-    # 2. Create graph and calculate the two core metrics
-
-    g = gt.Graph(directed=False)
-    g.vp.ids = g.add_edge_list(df_class[['node1', 'node2']].values, 
-                                hashed=True, 
-                                hash_type='int64_t')
-
-    # --- Metric 1: Sum of Degrees ---
-    deg = g.degree_property_map("total")
-    
-    node_degrees_dict = {g.vp.ids[v]: deg[v] for v in g.vertices()}
-    
-    degree1 = df_class['node1'].map(node_degrees_dict)
-    degree2 = df_class['node2'].map(node_degrees_dict)
-    df_class['degree'] = degree1 + degree2
-
-    print("Metrics calculated.")
-    
-    # 3. Determine thresholds
- 
-    degree_top = df_class['degree'].quantile(0.60)
-    degree_bottom = df_class['degree'].quantile(0.40)
-    
-    # 4. Define classification masks
-    mask_class1 = (df_class['degree'] >= degree_top)
-                  
-    mask_class2 = (df_class['degree'] <= degree_bottom)
-                  
-    # 5. Filter data and assign classes
-    df_filtered = df_class[mask_class1 | mask_class2].copy()
-    
-    df_filtered['class'] = np.where(
-        df_filtered['degree'] >= degree_top,
-        0,
-        1
-    )
-    
-    return df_filtered
-
 # def Classifying_SF(df):
 #     """
-#     Classifies edges based on "Augmented Forman-Ricci Curvature (AFRC)".
-#     Formula: AFRC = 4 - deg(u) - deg(v) + 3 * Triangles(u,v)
-#     - Class 0: AFRC in Top 30%.
-#     - Class 1: AFRC in Bottom 30%.
-#     Uses scipy.sparse
+#     Classifies edges based on "sum of degrees".
+#     - Class 0: Edges where sum of degrees is in the top 70%.
+#     - Class 1: Edges where sum of degrees is in the bottom 5%.
+#     Uses graph-tool
 #     """
 #     df_class = df.copy()
     
 #     # 1. Preprocessing: ensure node1 < node2
-#     mask_swap = df_class['node1'] > df_class['node2']
-#     df_class.loc[mask_swap, ['node1', 'node2']] = df_class.loc[mask_swap, ['node2', 'node1']].values
+#     for index, row in df_class.iterrows():
+#         u, v = row["node1"], row["node2"]
+#         if u > v:
+#             df_class.at[index, "node1"] = v
+#             df_class.at[index, "node2"] = u
             
-#     # 2. Calculate Degrees using graph-tool
+#     # 2. Create graph and calculate the two core metrics
+
 #     g = gt.Graph(directed=False)
 #     g.vp.ids = g.add_edge_list(df_class[['node1', 'node2']].values, 
 #                                 hashed=True, 
 #                                 hash_type='int64_t')
 
+#     # --- Metric 1: Sum of Degrees ---
 #     deg = g.degree_property_map("total")
+    
 #     node_degrees_dict = {g.vp.ids[v]: deg[v] for v in g.vertices()}
     
-#     d_u = df_class['node1'].map(node_degrees_dict).fillna(0).astype(int)
-#     d_v = df_class['node2'].map(node_degrees_dict).fillna(0).astype(int)
-    
-#     # 3. Calculate Triangles using Sparse Matrix Multiplication
-#     unique_nodes = pd.unique(df_class[['node1', 'node2']].values.ravel('K'))
-#     node_to_idx = {node: i for i, node in enumerate(unique_nodes)}
-    
-#     row_idx = df_class['node1'].map(node_to_idx).values
-#     col_idx = df_class['node2'].map(node_to_idx).values
-#     data = np.ones(len(df_class), dtype=int)
-#     N = len(unique_nodes)
-    
-#     # Create Symmetric Adjacency Matrix A
-#     A = csr_matrix((data, (row_idx, col_idx)), shape=(N, N))
-#     A = A + A.T 
-    
-#     # A * A [u, v] gives the number of common neighbors (triangles)
-#     A2 = A.dot(A)
-#     triangles = A2[row_idx, col_idx].A1
-    
-#     # 4. Calculate AFRC
-#     # Formula: 4 - du - dv + 3 * triangles
-#     df_class['AFRC'] = 4 - d_u - d_v + 3 * triangles
+#     degree1 = df_class['node1'].map(node_degrees_dict)
+#     degree2 = df_class['node2'].map(node_degrees_dict)
+#     df_class['degree'] = degree1 + degree2
 
-#     print("Metrics calculated (AFRC).")
+#     print("Metrics calculated.")
     
-#     # 5. Determine thresholds (Top/Bottom 30%)
-#     afrc_top = df_class['AFRC'].quantile(0.60)
-#     afrc_bottom = df_class['AFRC'].quantile(0.40)
+#     # 3. Determine thresholds
+ 
+#     degree_top = df_class['degree'].quantile(0.3)
+#     degree_bottom = df_class['degree'].quantile(0.05)
     
-#     # 6. Define classification masks
-#     mask_class0 = (df_class['AFRC'] >= afrc_top)
-#     mask_class1 = (df_class['AFRC'] <= afrc_bottom)
+#     # 4. Define classification masks
+#     mask_class1 = (df_class['degree'] >= degree_top)
                   
-#     # 7. Filter data and assign classes
-#     df_filtered = df_class[mask_class0 | mask_class1].copy()
+#     mask_class2 = (df_class['degree'] <= degree_bottom)
+                  
+#     # 5. Filter data and assign classes
+#     df_filtered = df_class[mask_class1 | mask_class2].copy()
     
 #     df_filtered['class'] = np.where(
-#         df_filtered['AFRC'] >= afrc_top,
+#         df_filtered['degree'] >= degree_top,
 #         0,
 #         1
 #     )
     
 #     return df_filtered
+
+def Classifying_SF(df):
+    """
+    Classifies edges based on "Augmented Forman-Ricci Curvature (AFRC)".
+    Formula: AFRC = 4 - deg(u) - deg(v) + 3 * Triangles(u,v)
+    - Class 0: AFRC in Top 5%.
+    - Class 1: AFRC in Bottom 70%.
+    Uses scipy.sparse
+    """
+    df_class = df.copy()
+    
+    # 1. Preprocessing: ensure node1 < node2
+    mask_swap = df_class['node1'] > df_class['node2']
+    df_class.loc[mask_swap, ['node1', 'node2']] = df_class.loc[mask_swap, ['node2', 'node1']].values
+            
+    # 2. Calculate Degrees using graph-tool
+    g = gt.Graph(directed=False)
+    g.vp.ids = g.add_edge_list(df_class[['node1', 'node2']].values, 
+                                hashed=True, 
+                                hash_type='int64_t')
+
+    deg = g.degree_property_map("total")
+    node_degrees_dict = {g.vp.ids[v]: deg[v] for v in g.vertices()}
+    
+    d_u = df_class['node1'].map(node_degrees_dict).fillna(0).astype(int)
+    d_v = df_class['node2'].map(node_degrees_dict).fillna(0).astype(int)
+    
+    # 3. Calculate Triangles using Sparse Matrix Multiplication
+    unique_nodes = pd.unique(df_class[['node1', 'node2']].values.ravel('K'))
+    node_to_idx = {node: i for i, node in enumerate(unique_nodes)}
+    
+    row_idx = df_class['node1'].map(node_to_idx).values
+    col_idx = df_class['node2'].map(node_to_idx).values
+    data = np.ones(len(df_class), dtype=int)
+    N = len(unique_nodes)
+    
+    # Create Symmetric Adjacency Matrix A
+    A = csr_matrix((data, (row_idx, col_idx)), shape=(N, N))
+    A = A + A.T 
+    
+    # A * A [u, v] gives the number of common neighbors (triangles)
+    A2 = A.dot(A)
+    triangles = A2[row_idx, col_idx].A1
+    
+    # 4. Calculate AFRC
+    # Formula: 4 - du - dv + 3 * triangles
+    df_class['AFRC'] = 4 - d_u - d_v + 3 * triangles
+
+    print("Metrics calculated (AFRC).")
+    
+    # 5. Determine thresholds (Top/Bottom 30%)
+    afrc_top = df_class['AFRC'].quantile(0.95)
+    afrc_bottom = df_class['AFRC'].quantile(0.70)
+    
+    # 6. Define classification masks
+    mask_class0 = (df_class['AFRC'] >= afrc_top)
+    mask_class1 = (df_class['AFRC'] <= afrc_bottom)
+                  
+    # 7. Filter data and assign classes
+    df_filtered = df_class[mask_class0 | mask_class1].copy()
+    
+    df_filtered['class'] = np.where(
+        df_filtered['AFRC'] >= afrc_top,
+        0,
+        1
+    )
+    
+    return df_filtered
 
 # Preliminary classification for StocastcBlock
 def Classifying_SB(df):
@@ -356,11 +356,192 @@ def KS_Data_Preprocessing(df):
     return df_class0_KS, df_class1_KS
 
 # Select edge pairs for Bivariate Test
-def BEDT_Data_Preprocessing(df,dfall):
+# def BEDT_Data_Preprocessing(df,dfall):
+#     np.random.seed(423) 
+
+#     df_data = df.to_dict('index')
+
+#     edge_info = {}
+#     class_edges = defaultdict(list)
+#     node_map = defaultdict(set)
+    
+#     for idx, row_data in df_data.items():
+#         u, v = sorted([row_data['node1'], row_data['node2']])
+#         edge_info[idx] = (u, v)
+#         cls = row_data['class']
+#         class_edges[cls].append(idx)
+#         node_map[u].add(idx)
+#         node_map[v].add(idx)
+    
+#     # Generate candidate pairs for each class and sort them internally
+#     class0_candidates = []
+#     class1_candidates = []
+    
+#     for cls in class_edges:
+#         edges = class_edges[cls]
+#         cls_pairs = []
+#         for i in range(len(edges)):
+#             e1 = edges[i]
+#             u1, v1 = edge_info[e1]
+#             connected = node_map[u1].union(node_map[v1])
+#             for e2 in connected:
+#                 if e2 <= e1 or df_data[e2]['class'] != cls:
+#                     continue
+#                 u2, v2 = edge_info[e2]
+#                 if {u1, v1}.isdisjoint({u2, v2}):
+#                     continue
+#                 pair = tuple(sorted((e1, e2)))
+#                 cls_pairs.append((pair, cls))
+        
+#         # Sort by the number of shared nodes in descending order within the class
+#         cls_pairs.sort(key=lambda x: -len(set(edge_info[x[0][0]] + edge_info[x[0][1]])))
+        
+#         if cls == 0:
+#             class0_candidates = cls_pairs
+#         else:
+#             class1_candidates = cls_pairs
+
+#     # Process candidate pairs, prioritizing the class with fewer selected pairs
+#     i0 = 0
+#     i1 = 0
+#     selected_0 = 0
+#     selected_1 = 0
+#     used_nodes = set()
+#     used_edges = set()
+#     selected = []
+    
+#     while i0 < len(class0_candidates) or i1 < len(class1_candidates):
+#         # Determine which class to process next
+#         current_cls = None
+#         if selected_0 <= selected_1:
+#             if i0 < len(class0_candidates):
+#                 current_cls = 0
+#             else:
+#                 current_cls = 1 if i1 < len(class1_candidates) else None
+#         else:
+#             if i1 < len(class1_candidates):
+#                 current_cls = 1
+#             else:
+#                 current_cls = 0 if i0 < len(class0_candidates) else None
+        
+#         if current_cls is None:
+#             break
+        
+#         if current_cls == 0:
+#             current_pair, cls = class0_candidates[i0]
+#             i0 += 1
+#         else:
+#             current_pair, cls = class1_candidates[i1]
+#             i1 += 1
+        
+#         e1, e2 = current_pair
+#         nodes = set(edge_info[e1] + edge_info[e2])
+#         edges = {e1, e2}
+        
+#         if nodes.isdisjoint(used_nodes) and edges.isdisjoint(used_edges):
+#             u1, v1 = edge_info[e1]
+#             u2, v2 = edge_info[e2]
+#             shared = (set([u1, v1]) & set([u2, v2])).pop()
+            
+#             flow1 = df_data[e1]['flow']
+#             flow2 = df_data[e2]['flow']
+#             if shared == u1:
+#                 flow1 *= -1
+#             if shared == v2:
+#                 flow2 *= -1
+            
+#             selected.append({
+#                 'flow1': flow1,
+#                 'flow2': flow2,
+#                 'edge1': f"{u1},{v1}",
+#                 'edge2': f"{u2},{v2}",
+#                 'class': cls
+#             })
+            
+#             used_nodes.update(nodes)
+#             used_edges.update(edges)
+            
+#             if cls == 0:
+#                 selected_0 += 1
+#             else:
+#                 selected_1 += 1
+    
+#     # Split into class-specific DataFrames
+#     class0 = [item for item in selected if item['class'] == 0]
+#     class1 = [item for item in selected if item['class'] == 1]
+
+#     dfall_data = dfall.to_dict('index')
+#     edge_info_all = {}
+#     node_map_all = defaultdict(set)
+
+#     for idx, row_data in dfall_data.items():
+#         u, v = sorted([row_data['node1'], row_data['node2']])
+#         edge_info_all[idx] = (u, v)
+#         node_map_all[u].add(idx)
+#         node_map_all[v].add(idx)
+    
+#     # 2. Generate all_candidates from dfall
+#     all_candidates = []
+
+#     dfall_indices = list(dfall_data.keys())
+
+#     for i_idx in range(len(dfall_indices)):
+#             i = dfall_indices[i_idx]
+#             u1, v1 = edge_info_all[i]
+#             connected = node_map_all[u1].union(node_map_all[v1])
+#             for e2 in connected:
+#                 if e2 <= i: 
+#                     continue
+#                 u2, v2 = edge_info_all[e2]
+#                 if {u1, v1}.isdisjoint({u2, v2}): 
+#                     continue
+#                 all_candidates.append(tuple(sorted((i, e2))))
+    
+#     # 3. Sort and process global candidates with dfall
+#     all_candidates.sort(key=lambda x: -len(set(edge_info_all[x[0]] + edge_info_all[x[1]])))
+    
+#     selectedAll = []
+#     used_nodes_all = set()
+#     used_edges_all = set()
+    
+#     for pair in all_candidates:
+#         e1, e2 = pair
+#         nodes = set(edge_info_all[e1] + edge_info_all[e2])
+#         edges = {e1, e2}
+        
+#         if nodes.isdisjoint(used_nodes_all) and edges.isdisjoint(used_edges_all):
+#             u1, v1 = edge_info_all[e1]
+#             u2, v2 = edge_info_all[e2]
+#             shared = (set([u1, v1]) & set([u2, v2])).pop()
+            
+#             flow1 = dfall_data[e1]['flow']
+#             flow2 = dfall_data[e2]['flow']
+
+#             if shared == u1: flow1 *= -1
+#             if shared == v2: flow2 *= -1
+            
+#             selectedAll.append({
+#                 'flow1': flow1,
+#                 'flow2': flow2,
+#                 'edge1': f"{u1},{v1}",
+#                 'edge2': f"{u2},{v2}",
+#             })
+            
+#             used_nodes_all.update(nodes)
+#             used_edges_all.update(edges)
+    
+#     df0 = pd.DataFrame(class0, columns=['flow1', 'flow2', 'edge1', 'edge2']) if class0 else pd.DataFrame()
+#     df1 = pd.DataFrame(class1, columns=['flow1', 'flow2', 'edge1', 'edge2']) if class1 else pd.DataFrame()
+
+#     dfAll = pd.DataFrame(selectedAll, columns=['flow1', 'flow2', 'edge1', 'edge2']) if selectedAll else pd.DataFrame()
+    
+#     return df0, df1, dfAll
+
+# optimized version (starting from 2026-Feb-2; Scale Free)
+def BEDT_Data_Preprocessing(df, dfall):
     np.random.seed(423) 
 
     df_data = df.to_dict('index')
-
     edge_info = {}
     class_edges = defaultdict(list)
     node_map = defaultdict(set)
@@ -372,79 +553,88 @@ def BEDT_Data_Preprocessing(df,dfall):
         class_edges[cls].append(idx)
         node_map[u].add(idx)
         node_map[v].add(idx)
-    
-    # Generate candidate pairs for each class and sort them internally
-    class0_candidates = []
-    class1_candidates = []
-    
-    for cls in class_edges:
-        edges = class_edges[cls]
-        cls_pairs = []
+
+
+    def candidate_generator(target_cls, used_nodes_set, used_edges_set):
+        edges = class_edges[target_cls]
         for i in range(len(edges)):
             e1 = edges[i]
+
+            #  check if e1 is usable
+            if e1 in used_edges_set: continue
             u1, v1 = edge_info[e1]
+            if u1 in used_nodes_set or v1 in used_nodes_set: continue
+
             connected = node_map[u1].union(node_map[v1])
+            
             for e2 in connected:
-                if e2 <= e1 or df_data[e2]['class'] != cls:
+                if e2 <= e1 or df_data[e2]['class'] != target_cls:
                     continue
+                
+                # check if e2 is usable
+                if e2 in used_edges_set: continue
                 u2, v2 = edge_info[e2]
+                if u2 in used_nodes_set or v2 in used_nodes_set: continue
+                
                 if {u1, v1}.isdisjoint({u2, v2}):
                     continue
-                pair = tuple(sorted((e1, e2)))
-                cls_pairs.append((pair, cls))
-        
-        # Sort by the number of shared nodes in descending order within the class
-        cls_pairs.sort(key=lambda x: -len(set(edge_info[x[0][0]] + edge_info[x[0][1]])))
-        
-        if cls == 0:
-            class0_candidates = cls_pairs
-        else:
-            class1_candidates = cls_pairs
+                
+                # yield usable pair
+                yield (e1, e2)
 
-    # Process candidate pairs, prioritizing the class with fewer selected pairs
-    i0 = 0
-    i1 = 0
-    selected_0 = 0
-    selected_1 = 0
     used_nodes = set()
     used_edges = set()
     selected = []
     
-    while i0 < len(class0_candidates) or i1 < len(class1_candidates):
-        # Determine which class to process next
+    selected_0 = 0
+    selected_1 = 0
+
+    # check candidate generators for both classes
+    gen0 = candidate_generator(0, used_nodes, used_edges)
+    gen1 = candidate_generator(1, used_nodes, used_edges)
+    
+    # check if generators are done
+    gen0_exhausted = False
+    gen1_exhausted = False
+    
+    while not (gen0_exhausted and gen1_exhausted):
         current_cls = None
+        
+        # Determine which class to process next
         if selected_0 <= selected_1:
-            if i0 < len(class0_candidates):
+            if not gen0_exhausted:
                 current_cls = 0
-            else:
-                current_cls = 1 if i1 < len(class1_candidates) else None
-        else:
-            if i1 < len(class1_candidates):
+            elif not gen1_exhausted:
                 current_cls = 1
-            else:
-                current_cls = 0 if i0 < len(class0_candidates) else None
+        else:
+            if not gen1_exhausted:
+                current_cls = 1
+            elif not gen0_exhausted:
+                current_cls = 0
         
         if current_cls is None:
             break
-        
-        if current_cls == 0:
-            current_pair, cls = class0_candidates[i0]
-            i0 += 1
-        else:
-            current_pair, cls = class1_candidates[i1]
-            i1 += 1
-        
-        e1, e2 = current_pair
-        nodes = set(edge_info[e1] + edge_info[e2])
-        edges = {e1, e2}
-        
-        if nodes.isdisjoint(used_nodes) and edges.isdisjoint(used_edges):
+            
+        try:
+            if current_cls == 0:
+                e1, e2 = next(gen0)
+                selected_0 += 1
+            else:
+                e1, e2 = next(gen1)
+                selected_1 += 1
+                
             u1, v1 = edge_info[e1]
             u2, v2 = edge_info[e2]
+            
+            # update used nodes and edges
+            used_nodes.update([u1, v1, u2, v2])
+            used_edges.update([e1, e2])
+            
             shared = (set([u1, v1]) & set([u2, v2])).pop()
             
             flow1 = df_data[e1]['flow']
             flow2 = df_data[e2]['flow']
+            
             if shared == u1:
                 flow1 *= -1
             if shared == v2:
@@ -455,21 +645,24 @@ def BEDT_Data_Preprocessing(df,dfall):
                 'flow2': flow2,
                 'edge1': f"{u1},{v1}",
                 'edge2': f"{u2},{v2}",
-                'class': cls
+                'class': current_cls
             })
             
-            used_nodes.update(nodes)
-            used_edges.update(edges)
-            
-            if cls == 0:
-                selected_0 += 1
+        except StopIteration:
+            if current_cls == 0:
+                gen0_exhausted = True
             else:
-                selected_1 += 1
-    
+                gen1_exhausted = True
+
     # Split into class-specific DataFrames
     class0 = [item for item in selected if item['class'] == 0]
     class1 = [item for item in selected if item['class'] == 1]
+    
+    df0 = pd.DataFrame(class0, columns=['flow1', 'flow2', 'edge1', 'edge2']) if class0 else pd.DataFrame()
+    df1 = pd.DataFrame(class1, columns=['flow1', 'flow2', 'edge1', 'edge2']) if class1 else pd.DataFrame()
 
+    # Prepare for dfAll processing
+    
     dfall_data = dfall.to_dict('index')
     edge_info_all = {}
     node_map_all = defaultdict(set)
@@ -479,60 +672,61 @@ def BEDT_Data_Preprocessing(df,dfall):
         edge_info_all[idx] = (u, v)
         node_map_all[u].add(idx)
         node_map_all[v].add(idx)
-    
-    # 2. Generate all_candidates from dfall
-    all_candidates = []
-
+        
     dfall_indices = list(dfall_data.keys())
-
-    for i_idx in range(len(dfall_indices)):
+    
+    def all_candidate_generator(used_nodes_set, used_edges_set):
+        for i_idx in range(len(dfall_indices)):
             i = dfall_indices[i_idx]
+            
+            if i in used_edges_set: continue
             u1, v1 = edge_info_all[i]
+            if u1 in used_nodes_set or v1 in used_nodes_set: continue
+
             connected = node_map_all[u1].union(node_map_all[v1])
+            
             for e2 in connected:
                 if e2 <= i: 
                     continue
+                
+                if e2 in used_edges_set: continue
                 u2, v2 = edge_info_all[e2]
+                if u2 in used_nodes_set or v2 in used_nodes_set: continue
+
                 if {u1, v1}.isdisjoint({u2, v2}): 
                     continue
-                all_candidates.append(tuple(sorted((i, e2))))
-    
-    # 3. Sort and process global candidates with dfall
-    all_candidates.sort(key=lambda x: -len(set(edge_info_all[x[0]] + edge_info_all[x[1]])))
-    
+                
+                yield (i, e2)
+
     selectedAll = []
     used_nodes_all = set()
     used_edges_all = set()
     
-    for pair in all_candidates:
-        e1, e2 = pair
-        nodes = set(edge_info_all[e1] + edge_info_all[e2])
-        edges = {e1, e2}
-        
-        if nodes.isdisjoint(used_nodes_all) and edges.isdisjoint(used_edges_all):
-            u1, v1 = edge_info_all[e1]
-            u2, v2 = edge_info_all[e2]
-            shared = (set([u1, v1]) & set([u2, v2])).pop()
-            
-            flow1 = dfall_data[e1]['flow']
-            flow2 = dfall_data[e2]['flow']
-
-            if shared == u1: flow1 *= -1
-            if shared == v2: flow2 *= -1
-            
-            selectedAll.append({
-                'flow1': flow1,
-                'flow2': flow2,
-                'edge1': f"{u1},{v1}",
-                'edge2': f"{u2},{v2}",
-            })
-            
-            used_nodes_all.update(nodes)
-            used_edges_all.update(edges)
+    gen_all = all_candidate_generator(used_nodes_all, used_edges_all)
     
-    df0 = pd.DataFrame(class0, columns=['flow1', 'flow2', 'edge1', 'edge2']) if class0 else pd.DataFrame()
-    df1 = pd.DataFrame(class1, columns=['flow1', 'flow2', 'edge1', 'edge2']) if class1 else pd.DataFrame()
+    for pair in gen_all:
+        e1, e2 = pair
+        u1, v1 = edge_info_all[e1]
+        u2, v2 = edge_info_all[e2]
+        
+        used_nodes_all.update([u1, v1, u2, v2])
+        used_edges_all.update([e1, e2])
 
+        shared = (set([u1, v1]) & set([u2, v2])).pop()
+        
+        flow1 = dfall_data[e1]['flow']
+        flow2 = dfall_data[e2]['flow']
+
+        if shared == u1: flow1 *= -1
+        if shared == v2: flow2 *= -1
+        
+        selectedAll.append({
+            'flow1': flow1,
+            'flow2': flow2,
+            'edge1': f"{u1},{v1}",
+            'edge2': f"{u2},{v2}",
+        })
+    
     dfAll = pd.DataFrame(selectedAll, columns=['flow1', 'flow2', 'edge1', 'edge2']) if selectedAll else pd.DataFrame()
     
     return df0, df1, dfAll
