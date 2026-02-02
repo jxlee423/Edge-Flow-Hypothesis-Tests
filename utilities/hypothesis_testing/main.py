@@ -21,12 +21,17 @@ def main(input_path, dataset_id, batch_id, output_dir, run_ks, run_independence,
     print("\n--- 2. Loading and preprocessing data for selected tests ---")
     df_input = pd.read_csv(input_path)
 
+    print("   - Standardizing graph data (ensuring u < v and flip signed flows)...")
+    df_input = data_preprocess.standardize_graph_data(df_input)
+
     if run_ks or run_bivariate:
         print(f"   - Running Classifying (using {graph_type} graph)...")
         if graph_type == 'SmallWorld':
             class_data = data_preprocess.Classifying_SW(df_input)
         elif graph_type == 'StochasticBlock':
             class_data = data_preprocess.Classifying_SB(df_input)
+        elif graph_type == 'ScaleFree':
+            class_data = data_preprocess.Classifying_SF(df_input)
 
         # Save the result of Classifying
         class_data_path = os.path.join(results.run_dir, f"{dataset_id}_preprocessed_class_data.csv")
@@ -117,6 +122,6 @@ if __name__ == "__main__":
     parser.add_argument('--no-independence', dest='run_independence', action='store_false', help='Do not run the Independence test.')
     parser.add_argument('--no-bivariate', dest='run_bivariate', action='store_false', help='Do not run the Bivariate Equivalence test.')
     parser.add_argument('--jobs', type=int, default=-1, help='Number of parallel jobs for data preprocessing. -1 uses all available cores (default).')
-    parser.add_argument('--graph-type', type=str, default='SmallWorld', choices=['SmallWorld', 'StochasticBlock'], help="Type of graph model for classification. 'SmallWorld' uses Classifying_SM, 'StochasticBlock' uses Classifying_SB. Default is 'smallworld'.")
+    parser.add_argument('--graph-type', type=str, default='SmallWorld', choices=['SmallWorld', 'StochasticBlock', 'ScaleFree'], help="Type of graph model for classification. 'SmallWorld' uses Classifying_SM, 'StochasticBlock' uses Classifying_SB. Default is 'smallworld'.")
     args = parser.parse_args()
     main(args.input, args.id, args.batch_id, args.output, args.run_ks, args.run_independence, args.run_bivariate, args.jobs, args.graph_type)
