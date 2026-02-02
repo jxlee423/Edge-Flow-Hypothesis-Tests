@@ -5,3 +5,6 @@ __pycache__/
 results/synthetic/
 data/synthetic/
 Jiaxin_personal_folder/
+scripts/temp_data.mat
+scripts/matlab_workspace.mat
+scripts/result_data.mat
