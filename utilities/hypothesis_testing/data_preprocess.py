@@ -9,6 +9,146 @@ from collections import defaultdict
 from sklearn.mixture import GaussianMixture
 from scipy.sparse import csr_matrix
 
+def standardize_graph_data(df):
+    """
+    1. Ensure node1 < node2.
+    2. If node1 > node2, swap the nodes and reverse the flow's sign.
+    """
+    df = df.copy()
+    mask = df['node1'] > df['node2']
+    
+    # swap node1 and node2 where node1 > node2
+    df.loc[mask, ['node1', 'node2']] = df.loc[mask, ['node2', 'node1']].values
+    
+    # reverse the flow sign where node1 > node2
+    df.loc[mask, 'flow'] *= -1
+    
+    return df
+
+# Preliminary classification for ScaleFree
+def Classifying_SF(df):
+    """
+    Classifies edges based on "sum of degrees".
+    - Class 0: Edges where sum of degrees is in the top 20%.
+    - Class 1: Edges where sum of degrees is in the bottom 20%.
+    Uses graph-tool
+    """
+    df_class = df.copy()
+    
+    # 1. Preprocessing: ensure node1 < node2
+    for index, row in df_class.iterrows():
+        u, v = row["node1"], row["node2"]
+        if u > v:
+            df_class.at[index, "node1"] = v
+            df_class.at[index, "node2"] = u
+            
+    # 2. Create graph and calculate the two core metrics
+
+    g = gt.Graph(directed=False)
+    g.vp.ids = g.add_edge_list(df_class[['node1', 'node2']].values, 
+                                hashed=True, 
+                                hash_type='int64_t')
+
+    # --- Metric 1: Sum of Degrees ---
+    deg = g.degree_property_map("total")
+    
+    node_degrees_dict = {g.vp.ids[v]: deg[v] for v in g.vertices()}
+    
+    degree1 = df_class['node1'].map(node_degrees_dict)
+    degree2 = df_class['node2'].map(node_degrees_dict)
+    df_class['degree'] = degree1 + degree2
+
+    print("Metrics calculated.")
+    
+    # 3. Determine thresholds
+ 
+    degree_top = df_class['degree'].quantile(0.60)
+    degree_bottom = df_class['degree'].quantile(0.40)
+    
+    # 4. Define classification masks
+    mask_class1 = (df_class['degree'] >= degree_top)
+                  
+    mask_class2 = (df_class['degree'] <= degree_bottom)
+                  
+    # 5. Filter data and assign classes
+    df_filtered = df_class[mask_class1 | mask_class2].copy()
+    
+    df_filtered['class'] = np.where(
+        df_filtered['degree'] >= degree_top,
+        0,
+        1
+    )
+    
+    return df_filtered
+
+# def Classifying_SF(df):
+#     """
+#     Classifies edges based on "Augmented Forman-Ricci Curvature (AFRC)".
+#     Formula: AFRC = 4 - deg(u) - deg(v) + 3 * Triangles(u,v)
+#     - Class 0: AFRC in Top 30%.
+#     - Class 1: AFRC in Bottom 30%.
+#     Uses scipy.sparse
+#     """
+#     df_class = df.copy()
+    
+#     # 1. Preprocessing: ensure node1 < node2
+#     mask_swap = df_class['node1'] > df_class['node2']
+#     df_class.loc[mask_swap, ['node1', 'node2']] = df_class.loc[mask_swap, ['node2', 'node1']].values
+            
+#     # 2. Calculate Degrees using graph-tool
+#     g = gt.Graph(directed=False)
+#     g.vp.ids = g.add_edge_list(df_class[['node1', 'node2']].values, 
+#                                 hashed=True, 
+#                                 hash_type='int64_t')
+
+#     deg = g.degree_property_map("total")
+#     node_degrees_dict = {g.vp.ids[v]: deg[v] for v in g.vertices()}
+    
+#     d_u = df_class['node1'].map(node_degrees_dict).fillna(0).astype(int)
+#     d_v = df_class['node2'].map(node_degrees_dict).fillna(0).astype(int)
+    
+#     # 3. Calculate Triangles using Sparse Matrix Multiplication
+#     unique_nodes = pd.unique(df_class[['node1', 'node2']].values.ravel('K'))
+#     node_to_idx = {node: i for i, node in enumerate(unique_nodes)}
+    
+#     row_idx = df_class['node1'].map(node_to_idx).values
+#     col_idx = df_class['node2'].map(node_to_idx).values
+#     data = np.ones(len(df_class), dtype=int)
+#     N = len(unique_nodes)
+    
+#     # Create Symmetric Adjacency Matrix A
+#     A = csr_matrix((data, (row_idx, col_idx)), shape=(N, N))
+#     A = A + A.T 
+    
+#     # A * A [u, v] gives the number of common neighbors (triangles)
+#     A2 = A.dot(A)
+#     triangles = A2[row_idx, col_idx].A1
+    
+#     # 4. Calculate AFRC
+#     # Formula: 4 - du - dv + 3 * triangles
+#     df_class['AFRC'] = 4 - d_u - d_v + 3 * triangles
+
+#     print("Metrics calculated (AFRC).")
+    
+#     # 5. Determine thresholds (Top/Bottom 30%)
+#     afrc_top = df_class['AFRC'].quantile(0.60)
+#     afrc_bottom = df_class['AFRC'].quantile(0.40)
+    
+#     # 6. Define classification masks
+#     mask_class0 = (df_class['AFRC'] >= afrc_top)
+#     mask_class1 = (df_class['AFRC'] <= afrc_bottom)
+                  
+#     # 7. Filter data and assign classes
+#     df_filtered = df_class[mask_class0 | mask_class1].copy()
+    
+#     df_filtered['class'] = np.where(
+#         df_filtered['AFRC'] >= afrc_top,
+#         0,
+#         1
+#     )
+    
+#     return df_filtered
+
 # Preliminary classification for StocastcBlock
 def Classifying_SB(df):
     """
