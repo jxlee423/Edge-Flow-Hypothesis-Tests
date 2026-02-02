@@ -1,4 +1,4 @@
-function [edge_to_endpoints,A] = fixed_degree_distribution_sampler(N,degree_dist);
+function [edge_to_endpoints,A] = degree_distribution_sampler(N,degree_dist);
 %% Samples a connected Erdos-Renyi random graph with N nodes and connection probability p
 
 %% Inputs
@@ -83,7 +83,6 @@ while stop == 0
     stop_MCMC = 1; % only try this if we need it
     while stop_MCMC == 0
         %% evaluate likelihood
-
 
         %% propose update to network
 
