@@ -1,0 +1,16 @@
+Dataset ID,Test Name,Parameters,P-Value,Alpha,Conclusion
+SmallWorld,KS Test,,1.2081004451368444e-75,0.016666667,Reject H0
+SmallWorld,Independence Test (Color: 0),"K_marg=148, K_joint=53, #target_color_samples=2862",0.000999001,0.005555556,Reject H0
+SmallWorld,Independence Test (Color: 1),"K_marg=148, K_joint=53, #target_color_samples=2824",0.000999001,0.005555556,Reject H0
+SmallWorld,Independence Test (Color: 2),"K_marg=149, K_joint=52, #target_color_samples=2788",0.000999001,0.005555556,Reject H0
+SmallWorld,Bivariate Equivalence Test,"K=15, #class1=225, #class2=820",0.004995005,0.016666667,Reject H0
+StochasticBlock,KS Test,,7.490951593410836e-64,0.016666667,Reject H0
+StochasticBlock,Independence Test (Color: 0),"K_marg=148, K_joint=53, #target_color_samples=2862",0.000999001,0.005555556,Reject H0
+StochasticBlock,Independence Test (Color: 1),"K_marg=148, K_joint=53, #target_color_samples=2824",0.000999001,0.005555556,Reject H0
+StochasticBlock,Independence Test (Color: 2),"K_marg=149, K_joint=52, #target_color_samples=2788",0.000999001,0.005555556,Reject H0
+StochasticBlock,Bivariate Equivalence Test,"K=16, #class1=277, #class2=1403",0.026973027,0.016666667,Fail to Reject H0
+ScaleFree,KS Test,N/A,3.188877051208535e-22,0.016666666666666666,Reject H0
+ScaleFree,Independence Test (Color: 0),"K_marg=148, K_joint=53, #target_color_samples=2862",0.000999001,0.005555556,Reject H0
+ScaleFree,Independence Test (Color: 1),"K_marg=148, K_joint=53, #target_color_samples=2824",0.000999001,0.005555556,Reject H0
+ScaleFree,Independence Test (Color: 2),"K_marg=149, K_joint=52, #target_color_samples=2788",0.000999001,0.005555556,Reject H0
+ScaleFree,Bivariate Equivalence Test,"K=26, #class1=677, #class2=1011",0.000999001,0.016666666666666666,Reject H0
