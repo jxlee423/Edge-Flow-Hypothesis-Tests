@@ -104,6 +104,12 @@ def add_plot_features(df):
     if df['setting'].str.contains('-Nc').any():
         df['Nc'] = df['setting'].str.extract(r'-Nc([\d.]+)_').astype(float)
 
+    if df['setting'].str.contains('_Dmin').any():
+        df['Dmin'] = df['setting'].str.extract(r'_Dmin(\d+)-').astype(float)
+
+    if df['setting'].str.contains('-Gamma').any():
+        df['Gamma'] = df['setting'].str.extract(r'-Gamma([\d.]+)_').astype(float)
+
     # Extract NodeCount
     def convert_k_to_numeric(node_str):
         if isinstance(node_str, str):
