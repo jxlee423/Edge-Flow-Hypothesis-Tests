@@ -1,0 +1,8 @@
+{
+    "color": 2,
+    "n_samples": 16074,
+    "observed_kl": 0.24695524423210505,
+    "p_value": 0.000999000999000999,
+    "optimal_k_marginal": 393,
+    "optimal_k_joint": 126
+}
