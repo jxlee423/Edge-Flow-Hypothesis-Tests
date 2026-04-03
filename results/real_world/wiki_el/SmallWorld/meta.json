@@ -1,0 +1,5 @@
+{
+    "dataset_id": "SmallWorld",
+    "input_file_path": "data/real_world/preprocessed/wiki_flow_network_el.csv",
+    "run_timestamp": "2026-04-03_05-17-44"
+}

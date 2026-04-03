@@ -1,0 +1,7 @@
+Dataset ID,Test Name,Parameters,P-Value,Alpha,Conclusion
+StochasticBlock,KS Test,,0.0,0.0166666666666666,Reject H0
+StochasticBlock,Bivariate Equivalence Test,"K=32, #class1=1057, #class2=15663",0.0009990009990009,0.0166666666666666,Reject H0
+SmallWorld,KS Test,,0.0,0.0166666666666666,Reject H0
+SmallWorld,Bivariate Equivalence Test,"K=32, #class1=1048, #class2=6376",0.0009990009990009,0.0166666666666666,Reject H0
+ScaleFree,KS Test,N/A,0.0,0.016666666666666666,Reject H0
+ScaleFree,Bivariate Equivalence Test,"K=51, #class1=2634, #class2=8374",0.000999000999000999,0.016666666666666666,Reject H0

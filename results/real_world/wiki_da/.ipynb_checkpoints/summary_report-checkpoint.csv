@@ -1,0 +1,5 @@
+Dataset ID,Test Name,Parameters,P-Value,Alpha,Conclusion
+SmallWorld,KS Test,,3.298873503705261e-274,0.0166666666666666,Reject H0
+SmallWorld,Bivariate Equivalence Test,"K=18, #class1=349, #class2=1217",0.0009990009990009,0.0166666666666666,Reject H0
+ScaleFree,KS Test,N/A,0.28481861305044043,0.016666666666666666,Fail to Reject H0
+ScaleFree,Bivariate Equivalence Test,"K=19, #class1=378, #class2=3178",0.967032967032967,0.016666666666666666,Fail to Reject H0
