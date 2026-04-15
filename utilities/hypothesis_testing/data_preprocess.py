@@ -81,7 +81,7 @@ def standardize_graph_data(df):
     
 #     return df_filtered
 
-def Classifying_SF(df):
+def Classifying_SF(df, data_type, fraction_top=0.05, fraction_bottom=0.7):
     """
     Classifies edges based on "Augmented Forman-Ricci Curvature (AFRC)".
     Formula: AFRC = 4 - deg(u) - deg(v) + 3 * Triangles(u,v)
@@ -129,28 +129,32 @@ def Classifying_SF(df):
     df_class['AFRC'] = 4 - d_u - d_v + 3 * triangles
 
     print("Metrics calculated (AFRC).")
-    
-    # 5. Determine thresholds (Top/Bottom 30%)
-    afrc_top = df_class['AFRC'].quantile(0.95)
-    afrc_bottom = df_class['AFRC'].quantile(0.70)
+
+    if data_type == 'real':
+        print("Auto-tuning balancing.")
+        q_top = 1.0 - fraction_top
+        q_bottom = fraction_bottom
+
+    else:
+        print("Fixed threshold.")
+        q_top = 0.95
+        q_bottom = 0.70
+
+    afrc_top = df_class['AFRC'].quantile(q_top)
+    afrc_bottom = df_class['AFRC'].quantile(q_bottom)
     
     # 6. Define classification masks
     mask_class0 = (df_class['AFRC'] >= afrc_top)
     mask_class1 = (df_class['AFRC'] <= afrc_bottom)
-                  
+                
     # 7. Filter data and assign classes
     df_filtered = df_class[mask_class0 | mask_class1].copy()
-    
-    df_filtered['class'] = np.where(
-        df_filtered['AFRC'] >= afrc_top,
-        0,
-        1
-    )
+    df_filtered['class'] = np.where(df_filtered['AFRC'] >= afrc_top, 0, 1)
     
     return df_filtered
 
 # Preliminary classification for StocastcBlock
-def Classifying_SB(df):
+def Classifying_SB(df, data_type, fraction_top=0.20, fraction_bottom=0.20):
     """
     Classifies edges based on "sum of degrees".
     - Class 0: Edges where sum of degrees is in the top 20%.
@@ -160,11 +164,8 @@ def Classifying_SB(df):
     df_class = df.copy()
     
     # 1. Preprocessing: ensure node1 < node2
-    for index, row in df_class.iterrows():
-        u, v = row["node1"], row["node2"]
-        if u > v:
-            df_class.at[index, "node1"] = v
-            df_class.at[index, "node2"] = u
+    mask_swap = df_class['node1'] > df_class['node2']
+    df_class.loc[mask_swap, ['node1', 'node2']] = df_class.loc[mask_swap, ['node2', 'node1']].values
             
     # 2. Create graph and calculate the two core metrics
 
@@ -185,42 +186,41 @@ def Classifying_SB(df):
     print("Metrics calculated.")
     
     # 3. Determine thresholds
+    if data_type == 'real':
+        print("Auto-tuning balancing.")
+        q_top = 1.0 - fraction_top
+        q_bottom = fraction_bottom
+    else:
+        print("Fixed threshold.")
+        q_top = 0.80
+        q_bottom = 0.20
+
+    degree_top = df_class['degree'].quantile(q_top)
+    degree_bottom = df_class['degree'].quantile(q_bottom)
+    
+    # Define classification masks
+    mask_class0 = (df_class['degree'] >= degree_top)
+    mask_class1 = (df_class['degree'] <= degree_bottom)
+                    
+    # Filter data and assign classes
+    df_filtered = df_class[mask_class0 | mask_class1].copy()
+    df_filtered['class'] = np.where(df_filtered['degree'] >= degree_top, 0, 1)
  
-    degree_top = df_class['degree'].quantile(0.80)
-    degree_bottom = df_class['degree'].quantile(0.20)
-    
-    # 4. Define classification masks
-    mask_class1 = (df_class['degree'] >= degree_top)
-                  
-    mask_class2 = (df_class['degree'] <= degree_bottom)
-                  
-    # 5. Filter data and assign classes
-    df_filtered = df_class[mask_class1 | mask_class2].copy()
-    
-    df_filtered['class'] = np.where(
-        df_filtered['degree'] >= degree_top,
-        0,
-        1
-    )
-    
     return df_filtered
 
 # Preliminary classification for SmallWorld
-def Classifying_SW(df):
+def Classifying_SW(df, data_type, fraction_top=0.25, fraction_bottom=0.25):
     """
     Classifies edges based on two metrics: "edge betweenness" and "sum of degrees".
-    - Class 1: Edges where both edge betweenness and sum of degrees are in the top 25%.
-    - Class 2: Edges where both edge betweenness and sum of degrees are in the bottom 25%.
+    - Class 0: Edges where both edge betweenness and sum of degrees are in the top 25%.
+    - Class 1: Edges where both edge betweenness and sum of degrees are in the bottom 25%.
     Uses graph-tool
     """
     df_class = df.copy()
     
     # 1. Preprocessing: ensure node1 < node2
-    for index, row in df_class.iterrows():
-        u, v = row["node1"], row["node2"]
-        if u > v:
-            df_class.at[index, "node1"] = v
-            df_class.at[index, "node2"] = u
+    mask_swap = df_class['node1'] > df_class['node2']
+    df_class.loc[mask_swap, ['node1', 'node2']] = df_class.loc[mask_swap, ['node2', 'node1']].values
             
     # 2. Create graph and calculate the two core metrics
 
@@ -238,34 +238,37 @@ def Classifying_SW(df):
     
     node_degrees_dict = {g.vp.ids[v]: deg[v] for v in g.vertices()}
     
-    degree1 = df_class['node1'].map(node_degrees_dict)
-    degree2 = df_class['node2'].map(node_degrees_dict)
-    df_class['degree'] = degree1 + degree2
+    degree0 = df_class['node1'].map(node_degrees_dict)
+    degree1 = df_class['node2'].map(node_degrees_dict)
+    df_class['degree'] = degree0 + degree1
 
     print("Metrics calculated.")
     
     # 3. Determine thresholds
-    betweenness_top = df_class['betweenness'].quantile(0.75)
-    betweenness_bottom = df_class['betweenness'].quantile(0.25)
-    
-    degree_top = df_class['degree'].quantile(0.75)
-    degree_bottom = df_class['degree'].quantile(0.25)
+    if data_type == 'real':
+        print("Auto-tuning balancing.")
+        q_top = 1.0 - fraction_top
+        q_bottom = fraction_bottom
+    else:
+        print("Fixed threshold.")
+        q_top = 0.75
+        q_bottom = 0.25
+
+    betweenness_top = df_class['betweenness'].quantile(q_top)
+    betweenness_bottom = df_class['betweenness'].quantile(q_bottom)
+    degree_top = df_class['degree'].quantile(q_top)
+    degree_bottom = df_class['degree'].quantile(q_bottom)
     
     # 4. Define classification masks
-    mask_class1 = (df_class['betweenness'] >= betweenness_top) & \
+    mask_class0 = (df_class['betweenness'] >= betweenness_top) & \
                   (df_class['degree'] >= degree_top)
                   
-    mask_class2 = (df_class['betweenness'] <= betweenness_bottom) & \
+    mask_class1 = (df_class['betweenness'] <= betweenness_bottom) & \
                   (df_class['degree'] <= degree_bottom)
                   
     # 5. Filter data and assign classes
-    df_filtered = df_class[mask_class1 | mask_class2].copy()
-    
-    df_filtered['class'] = np.where(
-        df_filtered['betweenness'] >= betweenness_top,
-        0,
-        1
-    )
+    df_filtered = df_class[mask_class0 | mask_class1].copy()
+    df_filtered['class'] = np.where(df_filtered['betweenness'] >= betweenness_top, 0, 1)
     
     return df_filtered
 
