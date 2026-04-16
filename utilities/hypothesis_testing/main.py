@@ -24,82 +24,49 @@ def main(input_path, dataset_id, batch_id, output_dir, run_ks, run_independence,
     print("   - Standardizing graph data (ensuring u < v and flip signed flows)...")
     df_input = data_preprocess.standardize_graph_data(df_input)
 
+    df_metrics = None
     if run_ks or run_bivariate:
-        mode_str = f"Auto-Tune" if (data_type == 'real' and auto_tune) else f"Manual/Fixed"
-        print(f"   - Running Classifying (using {graph_type} graph)...")
+        print(f"   - Computing Graph Metrics for {graph_type}...")
         if graph_type == 'SmallWorld':
-            fraction_top = 0.5 if user_fraction_top is None else user_fraction_top
-            fraction_bottom = 0.25 if user_fraction_bottom is None else user_fraction_bottom
+            df_metrics = data_preprocess.Compute_Metrics_SW(df_input)
+            init_top = 0.50 if user_fraction_top is None else user_fraction_top
+            init_bottom = 0.25 if user_fraction_bottom is None else user_fraction_bottom
         elif graph_type == 'StochasticBlock':
-            fraction_top = 0.5 if user_fraction_top is None else user_fraction_top
-            fraction_bottom = 0.20 if user_fraction_bottom is None else user_fraction_bottom
+            df_metrics = data_preprocess.Compute_Metrics_SB(df_input)
+            init_top = 0.50 if user_fraction_top is None else user_fraction_top
+            init_bottom = 0.20 if user_fraction_bottom is None else user_fraction_bottom
         elif graph_type == 'ScaleFree':
-            fraction_top = 0.05 if user_fraction_top is None else user_fraction_top
-            fraction_bottom = 0.70 if user_fraction_bottom is None else user_fraction_bottom
+            df_metrics = data_preprocess.Compute_Metrics_SF(df_input)
+            init_top = 0.05 if user_fraction_top is None else user_fraction_top
+            init_bottom = 0.70 if user_fraction_bottom is None else user_fraction_bottom
 
-        max_iterations = 10 if (auto_tune and data_type == 'real') else 1
-        tolerance = 0.4
-        loop_iter = 0
-
-        while loop_iter < max_iterations:
-            loop_iter += 1
-            if data_type == 'real':
-                if auto_tune:
-                    print(f"\n>>> Auto-Tuning Iteration {loop_iter}/{max_iterations} | fraction_top: {fraction_top:.2f}, fraction_bottom: {fraction_bottom:.2f} <<<")
-                else:
-                    print(f"\n>>> Manual/Fixed Processing | fraction_top: {fraction_top:.2f}, fraction_bottom: {fraction_bottom:.2f} <<<")
-            
-            if graph_type == 'SmallWorld':
-                class_data = data_preprocess.Classifying_SW(df_input, data_type, fraction_top, fraction_bottom)
-            elif graph_type == 'StochasticBlock':
-                class_data = data_preprocess.Classifying_SB(df_input, data_type, fraction_top, fraction_bottom)
-            elif graph_type == 'ScaleFree':
-                class_data = data_preprocess.Classifying_SF(df_input, data_type, fraction_top, fraction_bottom)
-
-            df0, df1, dfAll = data_preprocess.BEDT_Data_Preprocessing(class_data, df_input)
-            len0 = len(df0)
-            len1 = len(df1)
-
-            if not (auto_tune and data_type == 'real'):
-                print(f"   [Bivariate Edge Pairs Counts] Class 0: {len0}, Class 1: {len1} (Fixed thresholds applied)")
-                break
-
-            ratio = max(len0, len1) / min(len0, len1)
-
-            if ratio <= 1.0 + tolerance:
-                print(f"  Acceptable balance reached (diff < {tolerance*100:.0f}%). Class 0: {len0}, Class 1: {len1}")
-                break
-                
-            print(f"  Imbalance too high (Class 0: {len0}, Class 1: {len1}). Adjusting fractions...")
-            
-            step_size = 0.1
-            if len0 < len1:
-                fraction_top = min(0.90, fraction_top + step_size)
-                fraction_bottom = max(0.05, fraction_bottom - 0.5*step_size)
-            else:
-                fraction_bottom = min(0.90, fraction_bottom + step_size)
-                fraction_top = max(0.05, fraction_top - 0.5*step_size)
-
-        if loop_iter == max_iterations and auto_tune and data_type == 'real':
-            print("  Max iterations reached. Proceeding with the current best fractions.")
-
-        results.set_fractions(fraction_top, fraction_bottom)
-        # Save the result of Classifying
-        class_data_path = os.path.join(results.run_dir, f"{dataset_id}_preprocessed_class_data.csv")
-        print(f"   -> Saving classified data to: {class_data_path}")
-        class_data.to_csv(class_data_path, index=False)
-
+    ks_results = None
     if run_ks:
-        print("   - Running KS_Data_Preprocessing...")
-        df_class0_KS, df_class1_KS = data_preprocess.KS_Data_Preprocessing(class_data)
+        print("   - Running KS Data Preprocessing...")
+        class_data_ks, extracted_ks, ks_frac_top, ks_frac_bot = data_preprocess.run_auto_tuning_loop(
+            df_metrics, df_input, graph_type, data_type, 'KS', auto_tune, init_top, init_bottom
+        )
         
-        # Save the results of KS_Data_Preprocessing
-        ks0_path = os.path.join(results.run_dir, f"{dataset_id}_preprocessed_ks_class0.csv")
-        ks1_path = os.path.join(results.run_dir, f"{dataset_id}_preprocessed_ks_class1.csv")
-        print(f"   -> Saving K-S class 0 data to: {ks0_path}")
-        df_class0_KS.to_csv(ks0_path, index=False)
-        print(f"   -> Saving K-S class 1 data to: {ks1_path}")
-        df_class1_KS.to_csv(ks1_path, index=False)
+        # Save the results of K-S preprocessing
+        class_data_ks.to_csv(os.path.join(results.run_dir, f"{dataset_id}_class_data_KS.csv"), index=False)
+        extracted_ks[0].to_csv(os.path.join(results.run_dir, f"{dataset_id}_preprocessed_ks_class0.csv"), index=False)
+        extracted_ks[1].to_csv(os.path.join(results.run_dir, f"{dataset_id}_preprocessed_ks_class1.csv"), index=False)
+        
+        ks_results = {'top': ks_frac_top, 'bot': ks_frac_bot, 'data': extracted_ks}
+
+    bedt_results = None
+    if run_bivariate:
+        print("   - Running Bivariate Data Preprocessing...")
+        # Save the results of BEDT_Data_Preprocessing
+        class_data_bedt, extracted_bedt, bedt_frac_top, bedt_frac_bot = data_preprocess.run_auto_tuning_loop(
+            df_metrics, df_input, graph_type, data_type, 'BEDT', auto_tune, init_top, init_bottom
+        )
+        class_data_bedt.to_csv(os.path.join(results.run_dir, f"{dataset_id}_class_data_BEDT.csv"), index=False)
+        extracted_bedt[0].to_csv(os.path.join(results.run_dir, f"{dataset_id}_preprocessed_bivariate_df0.csv"), index=False)
+        extracted_bedt[1].to_csv(os.path.join(results.run_dir, f"{dataset_id}_preprocessed_bivariate_df1.csv"), index=False)
+        extracted_bedt[2].to_csv(os.path.join(results.run_dir, f"{dataset_id}_preprocessed_bivariate_dfAll.csv"), index=False)
+        
+        bedt_results = {'top': bedt_frac_top, 'bot': bedt_frac_bot, 'data': extracted_bedt}
 
     if run_independence:
         print("   - Running Coloring...")
@@ -110,18 +77,7 @@ def main(input_path, dataset_id, batch_id, output_dir, run_ks, run_independence,
         print(f"   -> Saving colored data to: {coloring_path}")
         df_ind_data.to_csv(coloring_path, index=False)
 
-    if run_bivariate:
-        print("   - Running Bivariate Data Preprocessing...")
-        # Save the results of BEDT_Data_Preprocessing
-        biv0_path = os.path.join(results.run_dir, f"{dataset_id}_preprocessed_bivariate_df0.csv")
-        biv1_path = os.path.join(results.run_dir, f"{dataset_id}_preprocessed_bivariate_df1.csv")
-        bivAll_path = os.path.join(results.run_dir, f"{dataset_id}_preprocessed_bivariate_dfAll.csv")
-        print(f"   -> Saving Bivariate df0 data to: {biv0_path}")
-        df0.to_csv(biv0_path, index=False)
-        print(f"   -> Saving Bivariate df1 data to: {biv1_path}")
-        df1.to_csv(biv1_path, index=False)
-        print(f"   -> Saving Bivariate dfAll data to: {bivAll_path}")
-        dfAll.to_csv(bivAll_path, index=False)
+
 
     # --- 3. Run tests ---
     print("\n>>> Starting statistical tests <<<")
@@ -129,17 +85,21 @@ def main(input_path, dataset_id, batch_id, output_dir, run_ks, run_independence,
     # K-S Test
     if run_ks:
         print("\n--- 1. Running K-S Test ---")
-        ks.run_ks_test(
+        df_class0_KS, df_class1_KS = ks_results['data']
+        res = ks.run_ks_test(
             df_class0_KS,
             df_class1_KS,
             config,
             results
         )
+        if res: # 将各自独有的 Fraction 记入报告
+            results.results_summary[-1]['Fraction Top'] = ks_results['top']
+            results.results_summary[-1]['Fraction Bottom'] = ks_results['bot']
     
     # Independence Test
     if run_independence:
         print("\n--- 2. Running Independence tests ---")
-        independence.run_independence_test(
+        res =independence.run_independence_test(
             df_ind_data,
             config,
             results
@@ -148,13 +108,17 @@ def main(input_path, dataset_id, batch_id, output_dir, run_ks, run_independence,
     # Bivariate Equivalence Test
     if run_bivariate:
         print("\n--- 3. Running Bivariate Equivalence Test ---")
-        bivariate.run_bivariate_test(
+        df0, df1, dfAll = bedt_results['data']
+        res = bivariate.run_bivariate_test(
             df0,
             df1,
             dfAll,
             config,
             results
         )
+        if res:
+            results.results_summary[-1]['Fraction Top'] = bedt_results['top']
+            results.results_summary[-1]['Fraction Bottom'] = bedt_results['bot']
     
     # --- 4. Generate final report ---
     results.compile_report()

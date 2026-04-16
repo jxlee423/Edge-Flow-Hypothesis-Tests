@@ -27,14 +27,7 @@ class ResultsManager:
         print(f"The summary report will be saved in: {self.batch_dir}")
 
         self.results_summary = []
-
-        self.fraction_top = "N/A"
-        self.fraction_bottom = "N/A"
         self._log_metadata(input_path)
-
-    def set_fractions(self, fraction_top, fraction_bottom):
-        self.fraction_top = round(fraction_top, 4) if isinstance(fraction_top, float) else fraction_top
-        self.fraction_bottom = round(fraction_bottom, 4) if isinstance(fraction_bottom, float) else fraction_bottom
 
     def _log_metadata(self, input_path):
         """Logs metadata for the current run into the dedicated run directory."""
@@ -65,11 +58,13 @@ class ResultsManager:
         fig.savefig(filepath)
         plt.close(fig)
 
-    def add_to_report(self, test_name, p_value, alpha, params='N/A'):
+    def add_to_report(self, test_name, p_value, alpha, fraction_top="N/A", fraction_bottom="N/A", params='N/A'):
         """Adds a result row to the in-memory summary list."""
         conclusion = 'Reject H0' if p_value < alpha else 'Fail to Reject H0'
         self.results_summary.append({
             'Test Name': test_name,
+            'Fraction Top': round(fraction_top, 4) if isinstance(fraction_top, float) else fraction_top,
+            'Fraction Bottom': round(fraction_bottom, 4) if isinstance(fraction_bottom, float) else fraction_bottom,
             'Parameters': str(params),
             'P-Value': p_value,
             'Alpha': alpha,
@@ -86,11 +81,9 @@ class ResultsManager:
 
         report_df = pd.DataFrame(self.results_summary)
         report_df['Dataset ID'] = self.dataset_id
-        report_df['Fraction Top'] = self.fraction_top
-        report_df['Fraction Bottom'] = self.fraction_bottom
         
         # Reorder columns to make 'Dataset ID' the first column
-        cols = ['Dataset ID', 'Fraction Top', 'Fraction Bottom'] + [col for col in report_df.columns if col not in ['Dataset ID', 'Fraction Top', 'Fraction Bottom']]
+        cols = ['Dataset ID', 'Fraction Top', 'Fraction Bottom', 'Test Name'] + [c for c in report_df.columns if c not in ['Dataset ID', 'Fraction Top', 'Fraction Bottom', 'Test Name']]
         report_df = report_df[cols]
 
         # Define the path for the master report
