@@ -401,7 +401,7 @@ def Apply_Thresholds_SW(df_metrics, data_type, fraction_top=0.25, fraction_botto
 def run_auto_tuning_loop(df_metrics, df_input, graph_type, data_type, target_test, auto_tune, init_top, init_bottom):
     """Hyperparameter tuning loop method"""
     fraction_top, fraction_bottom = init_top, init_bottom
-    max_iterations = 10 if (auto_tune and data_type == 'real') else 1
+    max_iterations = 5 if (auto_tune and data_type == 'real') else 1
     tolerance = 0.40
     loop_iter = 0
     
