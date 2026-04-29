@@ -12,7 +12,7 @@ from utilities.hypothesis_testing import data_preprocess
 from utilities.hypothesis_testing.tests import ks, bivariate, independence
 import os
 
-def main(input_path, dataset_id, batch_id, output_dir, run_ks, run_independence, run_bivariate, jobs, graph_type='SmallWorld', data_type='synthetic', auto_tune=False, user_fraction_top=None, user_fraction_bottom=None):
+def main(input_path, dataset_id, batch_id, output_dir, run_ks, run_independence, run_bivariate, jobs, graph_type='SmallWorld', data_type='synthetic', auto_tune=False, user_fraction_top=None, user_fraction_bottom=None, apply_jitter=False):
     # --- 1. Initialization ---
     print(f"Starting EFHT analysis - Batch ID: {batch_id}, Dataset ID: {dataset_id}")
     results = ResultsManager(output_dir, batch_id, dataset_id, input_path)
@@ -92,7 +92,7 @@ def main(input_path, dataset_id, batch_id, output_dir, run_ks, run_independence,
             config,
             results
         )
-        if res: # 将各自独有的 Fraction 记入报告
+        if res:
             results.results_summary[-1]['Fraction Top'] = ks_results['top']
             results.results_summary[-1]['Fraction Bottom'] = ks_results['bot']
     
@@ -102,7 +102,8 @@ def main(input_path, dataset_id, batch_id, output_dir, run_ks, run_independence,
         res =independence.run_independence_test(
             df_ind_data,
             config,
-            results
+            results,
+            apply_jitter=apply_jitter
         )
 
     # Bivariate Equivalence Test
@@ -141,5 +142,6 @@ if __name__ == "__main__":
     parser.add_argument('--auto-tune', action='store_true', help='Enable auto-tuning for fraction thresholds (applies only if data-type is real).')
     parser.add_argument('--fraction-top', type=float, default=None, help='Manually specify the top fraction. Overrides defaults.')
     parser.add_argument('--fraction-bottom', type=float, default=None, help='Manually specify the bottom fraction. Overrides defaults.')
+    parser.add_argument('--apply-jitter', action='store_true', help='Apply tiny random jitter to data in Independence Test to fix KNN density singularity.')
     args = parser.parse_args()
-    main(args.input, args.id, args.batch_id, args.output, args.run_ks, args.run_independence, args.run_bivariate, args.jobs, args.graph_type, args.data_type, args.auto_tune, args.fraction_top, args.fraction_bottom)
+    main(args.input, args.id, args.batch_id, args.output, args.run_ks, args.run_independence, args.run_bivariate, args.jobs, args.graph_type, args.data_type, args.auto_tune, args.fraction_top, args.fraction_bottom, args.apply_jitter)

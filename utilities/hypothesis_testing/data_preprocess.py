@@ -8,6 +8,7 @@ from joblib import Parallel, delayed
 from collections import defaultdict
 from sklearn.mixture import GaussianMixture
 from scipy.sparse import csr_matrix
+from scipy.sparse.csgraph import reverse_cuthill_mckee
 
 def standardize_graph_data(df):
     """
@@ -917,27 +918,154 @@ def BEDT_Data_Preprocessing(df, dfall):
     return df0, df1, dfAll
 
 
+# def Coloring(df, jobs=-1):
+#     """
+#     Groups edges based on the graph's edge coloring algorithm and creates pairs of the closest edges within each color group.
+#     This is to prepare the data required for the independence test.
+#     """
+#     df_colored = df.copy()
+#     # Ensure node1 < node2, and adjust flow direction accordingly
+#     swap_mask = df_colored["node1"] > df_colored["node2"]
+#     df_colored.loc[swap_mask, ['node1', 'node2']] = \
+#         df_colored.loc[swap_mask, ['node2', 'node1']].values
+#     df_colored.loc[swap_mask, "flow"] *= -1
+
+#     def _edge_coloring(edges):
+#         """Internal function: executes Vizing's theorem based edge coloring algorithm."""
+#         vertices = set()
+#         for u, v in edges:
+#             vertices.update({u, v})
+        
+#         if not vertices:
+#             return {}
+
+#         degree = {v: 0 for v in vertices}
+#         for u, v in edges:
+#             degree[u] += 1
+#             degree[v] += 1
+#         max_degree = max(degree.values())
+        
+#         color_map = {}
+#         used_colors = {v: set() for v in vertices}
+#         for edge in edges:
+#             u, v = sorted(edge)
+#             if (u, v) in color_map:
+#                 continue
+                
+#             forbidden = used_colors[u].union(used_colors[v])
+#             for color in range(max_degree*2 + 1):
+#                 if color not in forbidden:
+#                     color_map[(u, v)] = color
+#                     used_colors[u].add(color)
+#                     used_colors[v].add(color)
+#                     break
+#         return color_map
+
+#     edges = list(zip(df_colored["node1"], df_colored["node2"]))
+#     color_map = _edge_coloring(edges)
+
+#     if not color_map:
+#         return pd.DataFrame()
+        
+#     color_series = pd.Series(color_map)
+#     color_series.index = pd.MultiIndex.from_tuples(color_series.index)
+#     df_index = pd.MultiIndex.from_frame(df_colored[['node1', 'node2']])
+    
+#     df_colored['color'] = df_index.map(color_series).fillna(-1).astype(int)
+
+#     df_colored = df_colored[df_colored['color'] != -1].copy()
+
+#     original_G = nx.from_pandas_edgelist(
+#         df_colored, "node1", "node2", ["flow", "color"], create_using=nx.Graph()
+#     )
+    
+#     def process_color(color, G):
+#         """Internal function: pairing within each color group."""
+#         all_edges_in_color = [(u, v) for u, v, attr in G.edges(data=True) if attr.get("color") == color]
+#         target_edges = sorted([tuple(sorted(edge)) for edge in all_edges_in_color])
+        
+#         total_edges = len(target_edges)  
+#         if total_edges < 2:
+#             return []
+
+#         color_nodes = set()
+#         for u, v in target_edges:
+#             color_nodes.update([u, v])
+            
+#         local_sp = {}
+#         for node in color_nodes:
+#             dists = nx.single_source_shortest_path_length(G, node)
+#             local_sp[node] = {target: dists[target] for target in color_nodes if target in dists}
+
+#         edge_distances = []
+#         for i in range(len(target_edges)):
+#             for j in range(i + 1, len(target_edges)):
+#                 e1, e2 = target_edges[i], target_edges[j]
+#                 pairs = [
+#                     (e1[0], e2[0]), (e1[0], e2[1]),
+#                     (e1[1], e2[0]), (e1[1], e2[1])
+#                 ]
+#                 distance = min(local_sp.get(a, {}).get(b, float('inf')) for a, b in pairs)
+#                 edge_distances.append((distance, e1, e2))
+                
+#         edge_distances.sort(key=lambda x: (x[0], x[1], x[2]))
+#         used_edges = set()
+#         color_pairs = []
+#         target_count = int(0.9 * total_edges)
+
+#         for dist, e1, e2 in edge_distances:
+#             if len(used_edges) >= target_count:
+#                 break
+#             if e1 not in used_edges and e2 not in used_edges:
+#                 color_pairs.append({
+#                     "flowX": abs(G.edges[e1]["flow"]),
+#                     "flowY": abs(G.edges[e2]["flow"]),
+#                     "edgeX": f"{e1[0]},{e1[1]}",
+#                     "edgeY": f"{e2[0]},{e2[1]}",
+#                     "color": color,
+#                     "distance": dist
+#                 })
+#                 used_edges.update({e1, e2})
+#         return color_pairs
+
+#     color_counts = df_colored["color"].value_counts()
+
+#     top_3_colors = color_counts.nlargest(3).index.tolist()
+    
+#     print(f"Identified top 3 colors: {top_3_colors}")
+#     print(f"Edge counts for top 3: {color_counts.nlargest(3).to_dict()}")
+
+#     results = Parallel(n_jobs=jobs, prefer="processes")(
+#         delayed(process_color)(color, original_G)
+#         for color in tqdm(sorted(top_3_colors), desc="Processing Top 3 Colors")
+#     )
+    
+#     all_flow_pairs = pd.DataFrame([item for sublist in results for item in sublist])
+#     reflected = all_flow_pairs.copy()
+#     reflected['flowX'], reflected['flowY'] = all_flow_pairs['flowY'], all_flow_pairs['flowX']
+#     ind_data = pd.concat([all_flow_pairs, reflected], ignore_index = True)
+    
+#     return ind_data
+
+
 def Coloring(df, jobs=-1):
     """
-    Groups edges based on the graph's edge coloring algorithm and creates pairs of the closest edges within each color group.
-    This is to prepare the data required for the independence test.
+    Greedy Coloring based on RCM topological dimensionality reduction.
     """
     df_colored = df.copy()
-    # Ensure node1 < node2, and adjust flow direction accordingly
     swap_mask = df_colored["node1"] > df_colored["node2"]
     df_colored.loc[swap_mask, ['node1', 'node2']] = \
         df_colored.loc[swap_mask, ['node2', 'node1']].values
     df_colored.loc[swap_mask, "flow"] *= -1
 
+    # 1. Greedy Coloring
     def _edge_coloring(edges):
         """Internal function: executes Vizing's theorem based edge coloring algorithm."""
         vertices = set()
         for u, v in edges:
             vertices.update({u, v})
-        
         if not vertices:
             return {}
-
         degree = {v: 0 for v in vertices}
         for u, v in edges:
             degree[u] += 1
@@ -950,7 +1078,6 @@ def Coloring(df, jobs=-1):
             u, v = sorted(edge)
             if (u, v) in color_map:
                 continue
-                
             forbidden = used_colors[u].union(used_colors[v])
             for color in range(max_degree*2 + 1):
                 if color not in forbidden:
@@ -961,77 +1088,124 @@ def Coloring(df, jobs=-1):
         return color_map
 
     edges = list(zip(df_colored["node1"], df_colored["node2"]))
-    color_map = _edge_coloring(edges)
+    color_map_dict = _edge_coloring(edges)
 
-    if not color_map:
+    if not color_map_dict:
         return pd.DataFrame()
         
-    color_series = pd.Series(color_map)
+    color_series = pd.Series(color_map_dict)
     color_series.index = pd.MultiIndex.from_tuples(color_series.index)
     df_index = pd.MultiIndex.from_frame(df_colored[['node1', 'node2']])
     
     df_colored['color'] = df_index.map(color_series).fillna(-1).astype(int)
-
     df_colored = df_colored[df_colored['color'] != -1].copy()
 
-    original_G = nx.from_pandas_edgelist(
-        df_colored, "node1", "node2", ["flow", "color"], create_using=nx.Graph()
-    )
-
-    all_pairs_sp = dict(nx.all_pairs_shortest_path_length(original_G))
+    # 2. Construct graph-tool object
+    unique_nodes = np.unique(df_colored[['node1', 'node2']].values)
+    node_map = {node: i for i, node in enumerate(unique_nodes)}
+    rev_node_map = {i: node for node, i in node_map.items()}
+    N = len(unique_nodes)
     
-    def process_color(color, G, all_pairs_sp):
-        """Internal function: pairing within each color group."""
-        all_edges_in_color = [(u, v) for u, v, attr in G.edges(data=True) if attr.get("color") == color]
-        target_edges = sorted([tuple(sorted(edge)) for edge in all_edges_in_color])
-        
-        total_edges = len(target_edges)  
+    g = gt.Graph(directed=False)
+    edge_list = df_colored[['node1', 'node2']].values
+    mapped_edges = [(node_map[u], node_map[v]) for u, v in edge_list]
+    g.add_edge_list(mapped_edges)
+    
+    ep_flow = g.new_edge_property("double")
+    ep_flow.a = df_colored["flow"].values
+    g.ep["flow"] = ep_flow
+    
+    ep_color = g.new_edge_property("int")
+    ep_color.a = df_colored["color"].values
+    g.ep["color"] = ep_color
+
+    color_counts = df_colored["color"].value_counts()
+    top_3_colors = color_counts.nlargest(3).index.tolist()
+    
+    print(f"Identified top 3 colors: {top_3_colors}")
+    print(f"Edge counts for top 3: {color_counts.nlargest(3).to_dict()}")
+
+    # 3. Compute topological sequence via RCM
+    print("   - Computing topological sequence via RCM...")
+    row = np.array([node_map[u] for u in df_colored['node1']])
+    col = np.array([node_map[v] for v in df_colored['node2']])
+    data = np.ones(len(row), dtype=int)
+    
+    # Build sparse adjacency matrix and ensure symmetry
+    adj = csr_matrix((data, (row, col)), shape=(N, N))
+    adj = adj + adj.T 
+    
+    # Get RCM ordering, nodes connected in the graph will be assigned nearby coordinates
+    rcm_perm = reverse_cuthill_mckee(adj)
+    node_to_pos = np.empty(N, dtype=float)
+    node_to_pos[rcm_perm] = np.arange(N)
+
+    # 4. Pair edges based on topological coordinates and compute precise distances only for selected pairs
+    def process_color_gt(target_color, g_full):
+        selected_edges = [e for e in g_full.edges() if g_full.ep.color[e] == target_color]
+        total_edges = len(selected_edges)
         if total_edges < 2:
             return []
 
-        edge_distances = []
-        for i in range(len(target_edges)):
-            for j in range(i + 1, len(target_edges)):
-                e1, e2 = target_edges[i], target_edges[j]
-                pairs = [
-                    (e1[0], e2[0]), (e1[0], e2[1]),
-                    (e1[1], e2[0]), (e1[1], e2[1])
-                ]
-                distance = min(all_pairs_sp.get(a, {}).get(b, float('inf')) for a, b in pairs)
-                edge_distances.append((distance, e1, e2))
-        edge_distances.sort(key=lambda x: (x[0], x[1], x[2]))
-        used_edges = set()
-        color_pairs = []
-        target_count = int(0.9 * total_edges)
+        # Score each edge: average of endpoint coordinates
+        edge_scores = []
+        for e in selected_edges:
+            u, v = int(e.source()), int(e.target())
+            score = (node_to_pos[u] + node_to_pos[v]) / 2.0
+            edge_scores.append((score, e))
 
-        for dist, e1, e2 in edge_distances:
-            if len(used_edges) >= target_count:
+        # Sort: edges with similar scores are very close in the topological structure!
+        edge_scores.sort(key=lambda x: x[0])
+
+        color_pairs = []
+        target_count = int(0.9 * total_edges) # Extract 50% of the edges
+
+        # Directly pair adjacent siblings (step of 2, pairwise combination)
+        for i in range(0, len(edge_scores) - 1, 2):
+            if len(color_pairs) * 2 >= target_count:
                 break
-            if e1 not in used_edges and e2 not in used_edges:
-                color_pairs.append({
-                    "flowX": abs(G.edges[e1]["flow"]),
-                    "flowY": abs(G.edges[e2]["flow"]),
-                    "edgeX": f"{e1[0]},{e1[1]}",
-                    "edgeY": f"{e2[0]},{e2[1]}",
-                    "color": color,
-                    "distance": dist
-                })
-                used_edges.update({e1, e2})
+                
+            e1 = edge_scores[i][1]
+            e2 = edge_scores[i+1][1]
+            
+            u1, v1 = int(e1.source()), int(e1.target())
+            u2, v2 = int(e2.source()), int(e2.target())
+            
+            # only query the true shortest distance for the already paired edges
+            try:
+                d1 = gt.shortest_distance(g_full, source=u1, target=u2)
+                d2 = gt.shortest_distance(g_full, source=u1, target=v2)
+                d3 = gt.shortest_distance(g_full, source=v1, target=u2)
+                d4 = gt.shortest_distance(g_full, source=v1, target=v2)
+                dist = min(d1, d2, d3, d4)
+            except Exception:
+                continue
+
+            if dist >= 2147483647:
+                continue
+                
+            color_pairs.append({
+                "flowX": abs(g_full.ep.flow[e1]),
+                "flowY": abs(g_full.ep.flow[e2]),
+                "edgeX": f"{rev_node_map[u1]},{rev_node_map[v1]}",
+                "edgeY": f"{rev_node_map[u2]},{rev_node_map[v2]}",
+                "color": target_color,
+                "distance": int(dist)
+            })
+            
         return color_pairs
 
-    color_counts = df_colored["color"].value_counts()
-
-    top_5_colors = color_counts.nlargest(5).index.tolist()
-    
-    print(f"Identified top 5 colors: {top_5_colors}")
-    print(f"Edge counts for top 5: {color_counts.nlargest(5).to_dict()}")
-
-    results = Parallel(n_jobs=jobs, prefer="processes")(
-        delayed(process_color)(color, original_G, all_pairs_sp)
-        for color in tqdm(sorted(top_5_colors), desc="Processing Top 5 Colors")
+    results = Parallel(n_jobs=jobs, prefer="threads")(
+        delayed(process_color_gt)(c, g)
+        for c in tqdm(top_3_colors, desc="Processing Colors")
     )
     
-    all_flow_pairs = pd.DataFrame([item for sublist in results for item in sublist])
+    flattened_results = [item for sublist in results for item in sublist]
+    if not flattened_results:
+        print("   No edge pairs could be formed.")
+        return pd.DataFrame()
+        
+    all_flow_pairs = pd.DataFrame(flattened_results)
     reflected = all_flow_pairs.copy()
     reflected['flowX'], reflected['flowY'] = all_flow_pairs['flowY'], all_flow_pairs['flowX']
     ind_data = pd.concat([all_flow_pairs, reflected], ignore_index = True)

@@ -5,9 +5,17 @@ from scipy.interpolate import interp1d
 from joblib import Parallel, delayed
 from tqdm import tqdm
 
-def run_independence_test(df_reflected, config, results_manager):
+def run_independence_test(df_reflected, config, results_manager, apply_jitter=False):
     
     # --- 1. Get parameters from config ---
+    if apply_jitter:
+        print("   - Adding slight jitter to break up identical values...")
+        rng_jitter = np.random.default_rng(config.RANDOM_STATE)
+        jitter_scale = 1e-4
+        df_reflected['flowX'] += rng_jitter.normal(0, jitter_scale, len(df_reflected))
+        df_reflected['flowY'] += rng_jitter.normal(0, jitter_scale, len(df_reflected))
+    else:
+        print("   - Jitter is disabled; raw data is being used.")
     N_SIMULATIONS = config.INDEPENDENCE_N_SIMULATIONS
     TOP_N_COLORS = config.INDEPENDENCE_TOP_N_COLORS
     EPSILON = config.EPSILON
